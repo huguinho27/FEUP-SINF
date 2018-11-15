@@ -13,9 +13,11 @@ This is the repository for SINF subject project. The following text will explain
 npm install
 
 # change directory to ./client
+cd client
 npm install
 
 # return to root folder 
+cd ..
 npm run dev
 ```
 Takes a little to run the application.
