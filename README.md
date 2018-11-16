@@ -18,6 +18,7 @@ npm install
 
 # return to root folder 
 cd ..
+npm install concurrently --save
 npm run dev
 ```
 Takes a little to run the application.
