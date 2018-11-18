@@ -3,7 +3,7 @@ export default {
         {
             name: 'Dashboard',
             url: '/',
-            icon: 'icon-speedometer',
+            icon: 'icon-home',
         },
         {
             title: true,
@@ -26,12 +26,12 @@ export default {
         {
             name: 'Inventory',
             url: '/inventory',
-            icon: 'icon-pie-chart',
+            icon: 'icon-list',
         },
         {
             name: 'Finances',
             url: '/finances',
-            icon: 'icon-pie-chart',
+            icon: 'icon-chart',
         },
     ],
 };
