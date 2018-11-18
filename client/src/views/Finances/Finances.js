@@ -50,7 +50,9 @@ class Finances extends Component {
                     <main className="main">
                     <AppBreadcrumb appRoutes={routes} />
                   
-                        <div>gandas finanças aqui ó</div>
+                        <div className="animated fadeIn">
+                        gandas finanças aqui ó
+                        </div>
 
                     </main>
                 </div>
