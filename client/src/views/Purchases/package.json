@@ -1,0 +1,6 @@
+{
+  "name": "Purchases",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Purchases.js"
+}
