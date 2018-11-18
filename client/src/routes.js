@@ -42,7 +42,7 @@ const routes = [
   { path: '/sales', name: 'Sales', component: Sales },
   { path: '/purchases', name: 'Purchases', component: Purchases },
   { path: '/inventory', name: 'Inventory', component: Inventory },
-  { path: '/finances', name: 'finances', component: Finances },
+  { path: '/finances', name: 'Finances', component: Finances },
 
 ];
 
