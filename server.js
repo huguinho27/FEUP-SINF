@@ -5,14 +5,6 @@ let request = require('request');
 const app = express();
 const port = process.env.PORT || 5000;
 
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '',
-  database : 'sinfdemo'
-});
-connection.connect();
-
 /**
  * Get customers from DB
  */
@@ -81,6 +73,16 @@ app.get('/suppliers', (req, res)=>{
  * Get purchases from Primavera WebApi
  */
 app.get('/purchases', (req, res)=>{
+
+  var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'sinfdemo'
+  });
+  connection.connect();
+
+
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
   };
