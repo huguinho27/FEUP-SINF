@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody, CardHeader } from 'reactstrap';
+import { Container, Row, Col, Card, CardBody, CardHeader, Table, Badge } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 
@@ -25,32 +25,37 @@ import routes from '../../routes';
 import DefaultHeader from '../../containers/DefaultLayout/DefaultHeader';
 import DefaultFooter from '../../containers/DefaultLayout/DefaultFooter';
 
-const padding= {
+const padding = {
     paddingLeft: '20px',
     paddingRight: '20px'
 };
 
+const paddingCard = {
+    paddingBottom: '20px'
+}
+
+
 const bar = {
-labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-datasets: [
-    {
-    label: 'My First dataset',
-    backgroundColor: 'rgba(255,99,132,0.2)',
-    borderColor: 'rgba(255,99,132,1)',
-    borderWidth: 1,
-    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-    hoverBorderColor: 'rgba(255,99,132,1)',
-    data: [65, 59, 80, 81, 56, 55, 40],
-    },
-],
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [
+        {
+            label: 'My First dataset',
+            backgroundColor: 'rgba(255,99,132,0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1,
+            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+            hoverBorderColor: 'rgba(255,99,132,1)',
+            data: [65, 59, 80, 81, 56, 55, 40],
+        },
+    ],
 };
 
 const options = {
-tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-},
-maintainAspectRatio: false
+    tooltips: {
+        enabled: false,
+        custom: CustomTooltips
+    },
+    maintainAspectRatio: false
 }
 
 class Sales extends Component {
@@ -67,25 +72,30 @@ class Sales extends Component {
                         <AppSidebarForm />
                         <AppSidebarNav navConfig={navigation} {...this.props} />
                         <AppSidebarFooter />
-                        <AppSidebarMinimizer />            
+                        <AppSidebarMinimizer />
                     </AppSidebar>
                     <main className="main">
-                    <AppBreadcrumb appRoutes={routes} />
-                  
-                         <div style={padding} className="animated fadeIn">
-                            
+                        <AppBreadcrumb appRoutes={routes} />
+
+                        <div style={padding} className="animated fadeIn">
+
                             <Row>
-                            
                                 <Col>
                                     <Card className="text-white bg-primary">
                                         <CardHeader>
                                             <div className="text-value">Overview</div>
                                         </CardHeader>
                                         <CardBody className="pb-0 bg-info">
-                                            <div className="text-value">Total Sales</div>
-                                            <div>125.000 €</div>
-                                            <div className="text-value">Growth</div>
-                                            <div>4,20 %</div>
+                                            <Row>
+                                                <Col>
+                                                    <div className="text-value">Total Sales</div>
+                                                    <div style={paddingCard}>125.000 €</div>
+                                                </Col>
+                                                <Col>
+                                                    <div className="text-value">Growth</div>
+                                                    <div style={paddingCard}>4,20 %</div>
+                                                </Col>
+                                            </Row>
                                         </CardBody>
                                     </Card>
                                 </Col>
@@ -93,17 +103,66 @@ class Sales extends Component {
                                 <Col>
                                     <Card>
                                         <CardHeader>
-                                        Bar Chart
-                                        <div className="card-header-actions">
-                                            <a href="http://www.chartjs.org" className="card-header-action">
-                                            <small className="text-muted">docs</small>
-                                            </a>
-                                        </div>
+                                            Top Customers
                                         </CardHeader>
                                         <CardBody>
-                                        <div className="chart-wrapper">
-                                            <Bar data={bar} options={options} />
-                                        </div>
+                                            <Table responsive size="sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Username</th>
+                                                        <th>Date registered</th>
+                                                        <th>Sales</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Carwyn Fachtna</td>
+                                                        <td>2012/01/01</td>
+                                                        <td>Member</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Nehemiah Tatius</td>
+                                                        <td>2012/02/01</td>
+                                                        <td>Staff</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Ebbe Gemariah</td>
+                                                        <td>2012/02/01</td>
+                                                        <td>Admin</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Eustorgios Amulius</td>
+                                                        <td>2012/03/01</td>
+                                                        <td>Member</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Leopold Gáspár</td>
+                                                        <td>2012/01/21</td>
+                                                        <td>Staff</td>
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
+                                        </CardBody>
+                                    </Card>
+                                </Col>
+                            </Row>
+
+                            <Row>
+
+                                <Col xs="12" sm="6" lg="12">
+                                    <Card>
+                                        <CardHeader>
+                                            Bar Chart
+                                        <div className="card-header-actions">
+                                                <a href="http://www.chartjs.org" className="card-header-action">
+                                                    <small className="text-muted">docs</small>
+                                                </a>
+                                            </div>
+                                        </CardHeader>
+                                        <CardBody>
+                                            <div className="chart-wrapper">
+                                                <Bar data={bar} height={100} options={options} />
+                                            </div>
                                         </CardBody>
                                     </Card>
                                 </Col>
@@ -116,7 +175,7 @@ class Sales extends Component {
                 <AppFooter>
                     <DefaultFooter />
                 </AppFooter>
-            </div>  
+            </div>
         );
     }
 }
