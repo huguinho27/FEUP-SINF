@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container } from 'reactstrap';
-import { Bar, Doughnut, Line, Pie, Polar, Radar } from 'react-chartjs-2';
-import { Card, CardBody, CardColumns, CardHeader } from 'reactstrap';
+import { Container, Row, Col, Card, CardBody, CardHeader, Badge, Table } from 'reactstrap';
+import { Line } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 
 import {
@@ -31,6 +30,27 @@ const padding= {
     paddingRight: '20px'
 };
 
+const paddingCard = {
+    paddingBottom: '20px'
+}
+const bar = {
+labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+datasets: [
+    {
+    label: 'My First dataset',
+    backgroundColor: 'rgba(255,99,132,0.2)',
+    borderColor: 'rgba(255,99,132,1)',
+    borderWidth: 1,
+    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+    hoverBorderColor: 'rgba(255,99,132,1)',
+    data: [65, 59, 80, 81, 56, 55, 40],
+    },
+],
+};
+
+
+//intel on line chart
+
 const line = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
@@ -57,121 +77,6 @@ const line = {
       },
     ],
   };
-
-const bar = {
-labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-datasets: [
-    {
-    label: 'My First dataset',
-    backgroundColor: 'rgba(255,99,132,0.2)',
-    borderColor: 'rgba(255,99,132,1)',
-    borderWidth: 1,
-    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-    hoverBorderColor: 'rgba(255,99,132,1)',
-    data: [65, 59, 80, 81, 56, 55, 40],
-    },
-],
-};
-
-const doughnut = {
-    labels: [
-      'Red',
-      'Green',
-      'Yellow',
-    ],
-    datasets: [
-      {
-        data: [300, 50, 100],
-        backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-        ],
-        hoverBackgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-        ],
-      }],
-  };
-
-
-const radar = {
-labels: ['Eating', 'Drinking', 'Sleeping', 'Designing', 'Coding', 'Cycling', 'Running'],
-datasets: [
-    {
-    label: 'My First dataset',
-    backgroundColor: 'rgba(179,181,198,0.2)',
-    borderColor: 'rgba(179,181,198,1)',
-    pointBackgroundColor: 'rgba(179,181,198,1)',
-    pointBorderColor: '#fff',
-    pointHoverBackgroundColor: '#fff',
-    pointHoverBorderColor: 'rgba(179,181,198,1)',
-    data: [65, 59, 90, 81, 56, 55, 40],
-    },
-    {
-    label: 'My Second dataset',
-    backgroundColor: 'rgba(255,99,132,0.2)',
-    borderColor: 'rgba(255,99,132,1)',
-    pointBackgroundColor: 'rgba(255,99,132,1)',
-    pointBorderColor: '#fff',
-    pointHoverBackgroundColor: '#fff',
-    pointHoverBorderColor: 'rgba(255,99,132,1)',
-    data: [28, 48, 40, 19, 96, 27, 100],
-    },
-],
-};
-
-const pie = {
-    labels: [
-      'Red',
-      'Green',
-      'Yellow',
-    ],
-    datasets: [
-      {
-        data: [300, 50, 100],
-        backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-        ],
-        hoverBackgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-        ],
-      }],
-  };
-
-  const polar = {
-    datasets: [
-      {
-        data: [
-          11,
-          16,
-          7,
-          3,
-          14,
-        ],
-        backgroundColor: [
-          '#FF6384',
-          '#4BC0C0',
-          '#FFCE56',
-          '#E7E9ED',
-          '#36A2EB',
-        ],
-        label: 'My dataset' // for legend
-      }],
-    labels: [
-      'Red',
-      'Green',
-      'Yellow',
-      'Grey',
-      'Blue',
-    ],
-  };
-
 const options = {
 tooltips: {
     enabled: false,
@@ -179,7 +84,6 @@ tooltips: {
 },
 maintainAspectRatio: false
 }
-  
 
 class Purchases extends Component {
     render() {
@@ -201,98 +105,96 @@ class Purchases extends Component {
                     <AppBreadcrumb appRoutes={routes} />
                   
                          <div style={padding} className="animated fadeIn">
-                            <CardColumns className="cols-2">
+                            
+                            <Row>
+                            
+                                <Col>
+                                    <Card className="text-white bg-primary">
+                                        <CardHeader>
+                                            <div className="text-value">Overview</div>
+                                        </CardHeader>
+                                        <CardBody className="pb-0 bg-info">
+                                        <Row>
+                                                <Col>
+                                                    <div className="text-value">Total Purchases</div>
+                                                    <div style={paddingCard}>125.000 €</div>
+                                                </Col>
+                                                <Col>
+                                                    <div className="text-value">Growth</div>
+                                                    <div style={paddingCard}>4,20 %</div>
+                                                </Col>
+                                            </Row>
+                                        </CardBody>
+                                    </Card>
+                                </Col>
+                                <Col>
+                                <Card>
+              <CardHeader>
+                Top Suppliers
+              </CardHeader>
+              <CardBody>
+              <Table responsive size="sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Username</th>
+                                                        <th>Date registered</th>
+                                                        <th>Purchases</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Carwyn Fachtna</td>
+                                                        <td>2012/01/01</td>
+                                                        <td>Member</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Nehemiah Tatius</td>
+                                                        <td>2012/02/01</td>
+                                                        <td>Staff</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Ebbe Gemariah</td>
+                                                        <td>2012/02/01</td>
+                                                        <td>Admin</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Eustorgios Amulius</td>
+                                                        <td>2012/03/01</td>
+                                                        <td>Member</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Leopold Gáspár</td>
+                                                        <td>2012/01/21</td>
+                                                        <td>Staff</td>
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
+              </CardBody>
+            </Card>
+                                </Col> 
+                            </Row>
+                            <Row>
+                            <Col xs="12" lg="12">
                             <Card>
-                                <CardHeader>
-                                Line Chart
-                                <div className="card-header-actions">
-                                    <a href="http://www.chartjs.org" className="card-header-action">
-                                    <small className="text-muted">docs</small>
-                                    </a>
-                                </div>
-                                </CardHeader>
-                                <CardBody>
-                                <div className="chart-wrapper">
-                                    <Line data={line} options={options} />
-                                </div>
-                                </CardBody>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                Bar Chart
-                                <div className="card-header-actions">
-                                    <a href="http://www.chartjs.org" className="card-header-action">
-                                    <small className="text-muted">docs</small>
-                                    </a>
-                                </div>
-                                </CardHeader>
-                                <CardBody>
-                                <div className="chart-wrapper">
-                                    <Bar data={bar} options={options} />
-                                </div>
-                                </CardBody>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                Doughnut Chart
-                                <div className="card-header-actions">
-                                    <a href="http://www.chartjs.org" className="card-header-action">
-                                    <small className="text-muted">docs</small>
-                                    </a>
-                                </div>
-                                </CardHeader>
-                                <CardBody>
-                                <div className="chart-wrapper">
-                                    <Doughnut data={doughnut} />
-                                </div>
-                                </CardBody>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                Radar Chart
-                                <div className="card-header-actions">
-                                    <a href="http://www.chartjs.org" className="card-header-action">
-                                    <small className="text-muted">docs</small>
-                                    </a>
-                                </div>
-                                </CardHeader>
-                                <CardBody>
-                                <div className="chart-wrapper">
-                                    <Radar data={radar} />
-                                </div>
-                                </CardBody>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                Pie Chart
-                                <div className="card-header-actions">
-                                    <a href="http://www.chartjs.org" className="card-header-action">
-                                    <small className="text-muted">docs</small>
-                                    </a>
-                                </div>
-                                </CardHeader>
-                                <CardBody>
-                                <div className="chart-wrapper">
-                                    <Pie data={pie} />
-                                </div>
-                                </CardBody>
-                            </Card>
-                            <Card>
-                                <CardHeader>
-                                Polar Area Chart
-                                <div className="card-header-actions">
-                                    <a href="http://www.chartjs.org" className="card-header-action">
-                                    <small className="text-muted">docs</small>
-                                    </a>
-                                </div>
-                                </CardHeader>
-                                <CardBody>
-                                <div className="chart-wrapper">
-                                    <Polar data={polar} options={options}/>
-                                </div>
-                                </CardBody>
-                            </Card>
-                            </CardColumns>
+               <CardHeader>
+              Line Chart
+              <div className="card-header-actions">
+                <a href="http://www.chartjs.org" className="card-header-action">
+                  <small className="text-muted">docs</small>
+                </a>
+              </div>
+            </CardHeader>
+            <CardBody>
+              <div className="chart-wrapper">
+                <Line data={line} height ={250} options={options} />
+              </div>
+            </CardBody>
+          </Card>
+                                </Col>
+
+
+
+                            </Row>
                         </div>
 
                     </main>
