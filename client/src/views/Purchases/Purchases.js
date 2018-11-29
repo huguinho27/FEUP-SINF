@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
+import { Bar, Doughnut, Line, Pie, Polar, Radar } from 'react-chartjs-2';
+import { Card, CardBody, CardColumns, CardHeader } from 'reactstrap';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 
 import {
     AppBreadcrumb,
@@ -23,13 +26,10 @@ import routes from '../../routes';
 import DefaultHeader from '../../containers/DefaultLayout/DefaultHeader';
 import DefaultFooter from '../../containers/DefaultLayout/DefaultFooter';
 
-//<Redirect from="/" to="/dashboard" />
-//^ botar isto antes do </Switch>
-
-//Charts stuff
-import { Bar, Doughnut, Line, Pie, Polar, Radar } from 'react-chartjs-2';
-import { Card, CardBody, CardColumns, CardHeader } from 'reactstrap';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+const padding= {
+    paddingLeft: '20px',
+    paddingRight: '20px'
+};
 
 const line = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -200,7 +200,7 @@ class Purchases extends Component {
                     <main className="main">
                     <AppBreadcrumb appRoutes={routes} />
                   
-                         <div className="animated fadeIn">
+                         <div style={padding} className="animated fadeIn">
                             <CardColumns className="cols-2">
                             <Card>
                                 <CardHeader>

@@ -62,6 +62,12 @@ const pie2 = {
         }],
 };
 
+const padding= {
+    paddingLeft: '20px',
+    paddingRight: '20px',
+    paddingTop: '20px'
+};
+
 class DefaultLayout extends Component {
     render() {
         return (
@@ -91,7 +97,7 @@ class DefaultLayout extends Component {
                         
                         </Switch>
                     </Container>
-                        <div className="animated fadeIn">
+                        <div style={padding} className="animated fadeIn">
 
                         <Row>
                             <Col xs="12" sm="6" lg="3">
