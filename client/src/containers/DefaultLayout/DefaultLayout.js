@@ -137,8 +137,8 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
-                                        <div className="text-value">{this.state.totalSales} €</div>
-                                        <div style={paddingCard}>Total Sales</div>
+                                        <div className="text-value">Total Sales</div>
+                                        <div style={paddingCard}>{this.state.totalSales} €</div>
                                     </CardBody>
                                 </Card>
                             </Col>
