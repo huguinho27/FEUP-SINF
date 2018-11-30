@@ -25,6 +25,11 @@ import routes from '../../routes';
 import DefaultHeader from '../../containers/DefaultLayout/DefaultHeader';
 import DefaultFooter from '../../containers/DefaultLayout/DefaultFooter';
 
+const padding= {
+    paddingLeft: '20px',
+    paddingRight: '20px'
+};
+
 const line = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
@@ -80,7 +85,7 @@ class Finances extends Component {
                     <main className="main">
                     <AppBreadcrumb appRoutes={routes} />
                   
-                        <div className="animated fadeIn">                        
+                        <div style={padding} className="animated fadeIn">                        
                             <Row>
                                 <Col>
                                     <Card className="text-white bg-primary">
@@ -100,7 +105,7 @@ class Finances extends Component {
                                     <Card>
                                         <CardHeader>
                                             <div className="text-value">Finances</div>
-                                            <div className="text-value">Operating Costs, Sales and Revenues</div>
+                                            <div>Operating Costs, Sales and Revenues</div>
                                         </CardHeader>
                                         <CardBody>
                                             <div className="chart-wrapper">

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Badge, Card, CardBody, CardHeader, CardColumns, Container, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
-
+import { Bar, Doughnut, Line, Pie, Polar, Radar } from 'react-chartjs-2';
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+  
 import {
     AppBreadcrumb,
     AppFooter,
@@ -23,13 +25,11 @@ import routes from '../../routes';
 import DefaultHeader from '../../containers/DefaultLayout/DefaultHeader';
 import DefaultFooter from '../../containers/DefaultLayout/DefaultFooter';
 
-//<Redirect from="/" to="/dashboard" />
-//^ botar isto antes do </Switch>
+const padding= {
+    paddingLeft: '20px',
+    paddingRight: '20px'
+};
 
-//Charts stuff
-import { Bar, Doughnut, Line, Pie, Polar, Radar } from 'react-chartjs-2';
-import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-  
 class Inventory extends Component {
     render() {
         return (
@@ -49,7 +49,7 @@ class Inventory extends Component {
                     <main className="main">
                     <AppBreadcrumb appRoutes={routes} />
                   
-                        <div className="animated fadeIn">
+                        <div style={padding} className="animated fadeIn">
                            
                         <Row>
 
