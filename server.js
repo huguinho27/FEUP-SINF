@@ -144,4 +144,32 @@ app.get('/purchases', (req, res)=>{
   });
 });
 
+app.get('/dashboard/sales/total', (req,res)=>{
+  connectDB();
+  connection.query('SELECT sum(CreditAmount) FROM saleslines', (error, results, fields)=>{
+    if (error) throw error;
+    console.log('Db returned: ', results);
+    res.set('Content-Type', 'application/json');
+    res.status(200);
+    res.send(results);
+  });
+});
+
+app.get('/dashboard', (req, res)=>{
+  connectDB();
+  connection.query('SELECT sum(CreditAmount) AS sum FROM saleslines', (error, results, fields)=>{
+    if (error) throw error;
+    console.log('Db returned: ', results[0].sum);
+    let totalSales = Math.floor(results[0].sum).toLocaleString();
+    let dashboard = {
+      totalSales
+    };
+    res.set('Content-Type', 'application/json');
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.status(200);
+    res.send(dashboard);
+  });  
+});
+
 app.listen(port, () => console.log(`Listening on port ${port}`));
