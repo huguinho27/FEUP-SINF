@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader } from 'reactstrap';
 import { Pie } from 'react-chartjs-2';
+import 'whatwg-fetch';
+import 'isomorphic-fetch';
 
 import {
     AppAside,
@@ -24,6 +26,7 @@ import routes from '../../routes';
 
 import DefaultHeader from './DefaultHeader';
 import DefaultFooter from './DefaultFooter';
+import { callbackify } from 'util';
 
 //<Redirect from="/" to="/dashboard" />
 //^ botar isto antes do </Switch>
@@ -66,13 +69,40 @@ const pie2 = {
         }],
 };
 
-const padding= {
+const padding = {
     paddingLeft: '20px',
     paddingRight: '20px',
     paddingTop: '20px'
 };
 
+var totalSales = 0;
+
 class DefaultLayout extends Component {
+    constructor (props) {
+      super(props);
+
+      this.state = {
+        totalSales,
+      };
+    }
+    fetchData(event) {
+      fetch('http://localhost:5000/dashboard')
+      .then(function(response) {
+        if (response.status >= 400) {
+           throw new Error("Bad response from server");
+        }
+        return response.json();
+      })
+      .catch(function(err){
+        console.log(err);
+      })
+      .then((json) => this.setState({
+        totalSales: json.totalSales
+      }))
+    }
+    componentDidMount() {
+      this.fetchData();
+    }
     render() {
         return (
             <div className="app">
@@ -107,8 +137,8 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
-                                        <div className="text-value">Total Sales</div>
-                                        <div style={paddingCard}>125.000 €</div>
+                                        <div className="text-value">{this.state.totalSales} €</div>
+                                        <div style={paddingCard}>Total Sales</div>
                                     </CardBody>
                                 </Card>
                             </Col>
