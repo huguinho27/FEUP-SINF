@@ -155,7 +155,6 @@ class DefaultLayout extends Component {
                         
                         <div style={padding} className="animated fadeIn">
 
-
                             <div style={rowPadding}>
                                 <Row>
                                     <Col xs="0" sm="1" lg="1">
@@ -178,8 +177,7 @@ class DefaultLayout extends Component {
                                     </Col>
                                 </Row>
                             </div>
-
-                        
+                            
                         <Row>
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text-white bg-info">

@@ -3,6 +3,8 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader, Table, Badge } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 
 import {
     AppBreadcrumb,
@@ -34,6 +36,13 @@ const paddingCard = {
     paddingBottom: '20px'
 }
 
+const topPadding = {
+    paddingTop: '7px',
+}
+
+const rowPadding = {
+    paddingBottom: '20px'
+}
 
 const bar = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -58,6 +67,16 @@ const options = {
     maintainAspectRatio: false
 }
 
+const years = [
+    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
+]
+const defaultYear = years[8]
+const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+
+]
+const defaultMonth = months[4]
+
 class Sales extends Component {
     render() {
         return (
@@ -78,6 +97,29 @@ class Sales extends Component {
                         <AppBreadcrumb appRoutes={routes} />
 
                         <div style={padding} className="animated fadeIn">
+
+                            <div style={rowPadding}>
+                                <Row>
+                                    <Col xs="0" sm="1" lg="1">
+                                        <div style={topPadding}>Timespan:</div>
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2">
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    
+                                    </Col>
+                                    <Col xs="1" sm="1" lg="1">
+                                        <div style={topPadding}> until </div></Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    </Col>
+                                </Row>
+                            </div>
 
                             <Row>
                                 <Col>
