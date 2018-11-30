@@ -76,6 +76,7 @@ const padding = {
 };
 
 var totalSales = 0;
+var totalPurchases = 0;
 
 class DefaultLayout extends Component {
     constructor (props) {
@@ -83,10 +84,11 @@ class DefaultLayout extends Component {
 
       this.state = {
         totalSales,
+        totalPurchases
       };
     }
     fetchData(event) {
-      fetch('http://localhost:5000/dashboard')
+      fetch('http://localhost:5000/dashboard', {mode: 'cors'})
       .then(function(response) {
         if (response.status >= 400) {
            throw new Error("Bad response from server");
@@ -94,10 +96,11 @@ class DefaultLayout extends Component {
         return response.json();
       })
       .catch(function(err){
-        console.log(err);
+        console.log('Error: ', err);
       })
       .then((json) => this.setState({
-        totalSales: json.totalSales
+        totalSales: json.totalSales,
+        totalPurchases: json.totalPurchases
       }))
     }
     componentDidMount() {
@@ -147,7 +150,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Total Purchases</div>
-                                        <div style={paddingCard}>69.420 €</div>                                        
+                                        <div style={paddingCard}>{this.state.totalPurchases} €</div>                                        
                                     </CardBody>
                                 </Card>
                             </Col>

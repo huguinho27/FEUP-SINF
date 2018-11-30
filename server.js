@@ -90,7 +90,7 @@ app.get('/suppliers', (req, res)=>{
 /**
  * Get purchases from Primavera WebApi
  */
-app.get('/purchases', (req, res)=>{
+app.get('/purchases', (req, res)=> {
 
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
@@ -148,28 +148,108 @@ app.get('/dashboard/sales/total', (req,res)=>{
   connectDB();
   connection.query('SELECT sum(CreditAmount) FROM saleslines', (error, results, fields)=>{
     if (error) throw error;
-    console.log('Db returned: ', results);
     res.set('Content-Type', 'application/json');
     res.status(200);
     res.send(results);
   });
 });
 
+app.get('/dashboard/purchases/total', (req,res)=>{
+  let headers = {
+    'Content-type': 'application/x-www-form-urlencoded'
+  };
+
+  let options = {
+    method: 'post',
+    form: {
+      username: 'feup',
+      password: 'qualquer1',
+      company: 'DEMO',
+      instance: 'Default',
+      grant_type: 'password',
+      line: 'professional'
+    },
+    url: 'http://10.227.149.42:2018/WebApi/token',
+    headers
+  };
+
+  //Request to get authentication token
+  request(options, (error1, results1)=> {
+    if (error1) throw error1;
+    let parsedAuthentication = JSON.parse(results1.body);
+    let bearerToken = parsedAuthentication.access_token;
+    let bearer = parsedAuthentication.token_type;
+    
+    //Request to get purchases, providing the token
+    let headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer' + ' ' + bearerToken
+    };
+  
+    let options2 = {
+      headers,
+      method: 'get',
+      url: 'http://10.227.149.42:2018/WebApi/Administrador/Consulta',
+      body: '"Select abs(sum(PrecoLiquido)) FROM LinhasCompras, CabecCompras '+
+      'WHERE LinhasCompras.IdCabecCompras = CabecCompras.Id"'
+    };
+  
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        console.log(error2);
+      }
+      let obj = results2;
+      let obj2 = JSON.parse(results2.body);
+      res.send(obj2.DataSet.Table[0]);
+    });
+  });
+});
+
+/*app.get('/dashboard/inventoryvalue', (req, res) => {
+  
+});*/
+
 app.get('/dashboard', (req, res)=>{
   connectDB();
-  connection.query('SELECT sum(CreditAmount) AS sum FROM saleslines', (error, results, fields)=>{
-    if (error) throw error;
-    console.log('Db returned: ', results[0].sum);
-    let totalSales = Math.floor(results[0].sum).toLocaleString();
-    let dashboard = {
-      totalSales
+
+  //FIRST REQUEST - SALES
+  let options = {
+    method: 'get',
+    url: 'http://localhost:5000/dashboard/sales/total'
+  };
+  request(options, (error, results)=> {
+    if (error) {
+      console.log(error);
+    }
+    let sales = Math.floor(JSON.parse(results.body)[0]['sum(CreditAmount)']).toLocaleString();
+    console.log('sales: ', sales);
+    //SECOND REQUEST - PURCHASES
+    let options2 = {
+      method: 'get',
+      url: 'http://localhost:5000/dashboard/purchases/total'
     };
-    res.set('Content-Type', 'application/json');
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.status(200);
-    res.send(dashboard);
-  });  
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        console.log(error2);
+      }
+      let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
+      console.log('purchases: ', purchases);
+      let dashboard = {
+        totalSales: sales,
+        totalPurchases: purchases
+      };
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.set('Content-Type', 'application/json');
+      res.send(JSON.stringify(dashboard));
+    });
+  });
+
+  /*
+  let dashboard = {
+    totalSales: results2.body
+  };
+  */
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
