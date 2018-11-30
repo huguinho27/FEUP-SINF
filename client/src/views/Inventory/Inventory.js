@@ -53,61 +53,51 @@ class Inventory extends Component {
                            
                         <Row>
 
-                            <Col xs="12" lg="6">
+                            <Col lg="6">
+                                <Card className="text-white bg-info">
+                                    <CardBody className="pb-0">
+                                        <div className="text-value">125.000 €</div>
+                                        <div>Inventory Value</div>
+                                    </CardBody>
+                                </Card>
                                 <Card>
                                 <CardHeader>
-                                    <i className="fa fa-align-justify"></i> Striped Table
+                                    <i className="fa fa-align-justify"></i> Products in inventory
                                 </CardHeader>
                                 <CardBody>
                                     <Table responsive striped>
                                     <thead>
                                     <tr>
-                                        <th>Username</th>
-                                        <th>Date registered</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
+                                        <th>Name</th>
+                                        <th>Value per Unit</th>
+                                        <th>Quantity</th>
+                                        <th>Total Value</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr>
-                                        <td>Yiorgos Avraamu</td>
-                                        <td>2012/01/01</td>
-                                        <td>Member</td>
-                                        <td>
-                                        <Badge color="success">Active</Badge>
-                                        </td>
+                                        <td>Powerbank Miaomi Mi 2C</td>
+                                        <td>24 €</td>
+                                        <td>220</td>
+                                        <td>5,280 €</td>
                                     </tr>
                                     <tr>
-                                        <td>Avram Tarasios</td>
-                                        <td>2012/02/01</td>
-                                        <td>Staff</td>
-                                        <td>
-                                        <Badge color="danger">Banned</Badge>
-                                        </td>
+                                        <td>Memória RAM G.Skill V 16GB </td>
+                                        <td>156 €</td>
+                                        <td>140</td>
+                                        <td>21,000 €</td>
                                     </tr>
                                     <tr>
-                                        <td>Quintin Ed</td>
-                                        <td>2012/02/01</td>
-                                        <td>Admin</td>
-                                        <td>
-                                        <Badge color="secondary">Inactive</Badge>
-                                        </td>
+                                        <td>Router Asus RT-AX88U</td>
+                                        <td>428 €</td>
+                                        <td>70</td>
+                                        <td>29,960 €</td>
                                     </tr>
                                     <tr>
-                                        <td>Enéas Kwadwo</td>
-                                        <td>2012/03/01</td>
-                                        <td>Member</td>
-                                        <td>
-                                        <Badge color="warning">Pending</Badge>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Agapetus Tadeáš</td>
-                                        <td>2012/01/21</td>
-                                        <td>Staff</td>
-                                        <td>
-                                        <Badge color="success">Active</Badge>
-                                        </td>
+                                        <td>Portátil PNY Prevail Pro</td>
+                                        <td>799 €</td> 
+                                        <td>22</td>
+                                        <td>17,578 €</td>
                                     </tr>
                                     </tbody>
                                     </Table>
@@ -124,9 +114,52 @@ class Inventory extends Component {
                                 </CardBody>
                                 </Card>
                             </Col>
+
+                            <Col xs="12" lg="6">
+                            <Card>
+                                <CardHeader>
+                                    <i className="fa fa-align-justify"></i> Below Security Stock
+                                </CardHeader>
+                                <CardBody>
+                                    <Table responsive striped>
+                                    <tr>
+                                        <td>1- PC ASRock DeskMini</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2- Powerbank Miaomi Mi 2C</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3- Memória RAM G.Skill V 16GB</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4- Powerbank Miaomi Mi 2C</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5- Memória RAM G.Skill V 16GB</td>
+                                    </tr>
+                                    </Table>
+                                    <Pagination>
+                                    <PaginationItem disabled><PaginationLink previous tag="button">Prev</PaginationLink></PaginationItem>
+                                    <PaginationItem active>
+                                        <PaginationLink tag="button">1</PaginationLink>
+                                    </PaginationItem>
+                                    <PaginationItem><PaginationLink tag="button">2</PaginationLink></PaginationItem>
+                                    <PaginationItem><PaginationLink next tag="button">Next</PaginationLink></PaginationItem>
+                                    </Pagination>
+                                </CardBody>
+                                </Card>
+                            </Col>
                         
                          </Row>
 
+                        </div>
+                        <div className="below security stock">
+                            <Row>
+                            <Col xs="12" lg="6">
+                            
+                                
+                            </Col>
+                            </Row>
                         </div>
 
                     </main>
