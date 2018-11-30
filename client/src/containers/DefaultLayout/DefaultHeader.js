@@ -28,17 +28,6 @@ class DefaultHeader extends Component {
                 />
                 <AppSidebarToggler className="d-md-down-none" display="lg" />
                
-                <Nav className="d-md.down-none" navbar>
-                    <NavItem className="px-3">
-                        <NavLink href="/">Cenas 1</NavLink>
-                    </NavItem>
-                    <NavItem className="px-3">
-                        <NavLink href="/">Cenas 2</NavLink>
-                    </NavItem>
-                    <NavItem className="px-3">
-                        <NavLink href="/">Cenas 3</NavLink>
-                    </NavItem>
-                </Nav>
                 <AppAsideToggler className="d-md-down-none" />
             </React.Fragment>
         );
