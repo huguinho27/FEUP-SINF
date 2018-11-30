@@ -3,6 +3,8 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader, Table, Badge } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import 'whatwg-fetch';
+import 'isomorphic-fetch';
 
 import {
     AppBreadcrumb,
@@ -34,21 +36,10 @@ const paddingCard = {
     paddingBottom: '20px'
 }
 
-
-const bar = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
-        {
-            label: 'My First dataset',
-            backgroundColor: 'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-            hoverBorderColor: 'rgba(255,99,132,1)',
-            data: [65, 59, 80, 81, 56, 55, 40],
-        },
-    ],
-};
+var sale = {
+    InvoiceDate: '',
+    CreditAmount: 0,
+}
 
 const options = {
     tooltips: {
@@ -59,6 +50,44 @@ const options = {
 }
 
 class Sales extends Component {
+    constructor (props) {
+        super(props);
+
+        const bar = {
+            labels: [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ],
+            datasets: [
+                {
+                    label: 'Sales YTD',
+                    backgroundColor: 'rgba(255,99,132,0.2)',
+                    borderColor: 'rgba(255,99,132,1)',
+                    borderWidth: 1,
+                    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                    hoverBorderColor: 'rgba(255,99,132,1)',
+                    data: this.props.salesYTD,
+                },
+            ],
+        }
+
+        console.log(this.props.salesYTD)
+
+        this.state = {
+            salesLines: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        };
+    }
+
     render() {
         return (
             <div className="app">
@@ -152,7 +181,7 @@ class Sales extends Component {
                                 <Col xs="12" sm="6" lg="12">
                                     <Card>
                                         <CardHeader>
-                                            Bar Chart
+                                            Sales YTD
                                         <div className="card-header-actions">
                                                 <a href="http://www.chartjs.org" className="card-header-action">
                                                     <small className="text-muted">docs</small>
@@ -161,7 +190,7 @@ class Sales extends Component {
                                         </CardHeader>
                                         <CardBody>
                                             <div className="chart-wrapper">
-                                                <Bar data={bar} height={100} options={options} />
+                                                <Bar data={this.bar} height={100} options={options} />
                                             </div>
                                         </CardBody>
                                     </Card>

@@ -63,12 +63,13 @@ app.get('/products', (req, res)=>{
  */
 app.get('/sales', (req, res)=>{
   connectDB();
-  connection.query('SELECT salesInvoices.InvoiceNo, products.ProductType, products.ProductCode, products.ProductGroup, ' +
+  connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.InvoiceDate, products.ProductType, products.ProductCode, products.ProductGroup, ' +
   'products.ProductDescription, salesLines.UnitPrice, salesLines.CreditAmount FROM salesLines INNER JOIN salesInvoices ' +
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
   'products.ProductCode = salesLines.ProductCode', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.send(results);
   });
 });
