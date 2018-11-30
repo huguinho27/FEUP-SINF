@@ -53,7 +53,48 @@ class Sales extends Component {
     constructor (props) {
         super(props);
 
-        const bar = {
+        this.state = {
+            salesYTD: null
+        }
+    }
+
+    componentWillMount() {
+        this.fetchSales();
+    }
+
+    fetchSales() {
+        fetch('http://localhost:5000/sales', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.populateDataset(json))
+    }
+    
+    populateDataset(json) {
+        let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i = 0; i < json.length; i++) {
+            let month = parseInt(json[i].InvoiceDate.split("-")[1]);
+    
+            data[month-1] += Math.floor(json[i].CreditAmount);
+        }
+
+        this.setState({salesYTD: data});
+    }
+
+    render() {
+        var bar = {
             labels: [
                 'January',
                 'February',
@@ -76,19 +117,11 @@ class Sales extends Component {
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(255,99,132,0.4)',
                     hoverBorderColor: 'rgba(255,99,132,1)',
-                    data: this.props.salesYTD,
+                    data: this.state.salesYTD,
                 },
             ],
         }
 
-        console.log(this.props.salesYTD)
-
-        this.state = {
-            salesLines: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        };
-    }
-
-    render() {
         return (
             <div className="app">
                 <AppHeader fixed>
@@ -190,7 +223,7 @@ class Sales extends Component {
                                         </CardHeader>
                                         <CardBody>
                                             <div className="chart-wrapper">
-                                                <Bar data={this.bar} height={100} options={options} />
+                                                <Bar data={bar} height={100} options={options} />
                                             </div>
                                         </CardBody>
                                     </Card>
