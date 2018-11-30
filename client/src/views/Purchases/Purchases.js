@@ -25,7 +25,7 @@ import routes from '../../routes';
 import DefaultHeader from '../../containers/DefaultLayout/DefaultHeader';
 import DefaultFooter from '../../containers/DefaultLayout/DefaultFooter';
 
-const padding= {
+const padding = {
     paddingLeft: '20px',
     paddingRight: '20px'
 };
@@ -34,18 +34,18 @@ const paddingCard = {
     paddingBottom: '20px'
 }
 const bar = {
-labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-datasets: [
-    {
-    label: 'My First dataset',
-    backgroundColor: 'rgba(255,99,132,0.2)',
-    borderColor: 'rgba(255,99,132,1)',
-    borderWidth: 1,
-    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-    hoverBorderColor: 'rgba(255,99,132,1)',
-    data: [65, 59, 80, 81, 56, 55, 40],
-    },
-],
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [
+        {
+            label: 'My First dataset',
+            backgroundColor: 'rgba(255,99,132,0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1,
+            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+            hoverBorderColor: 'rgba(255,99,132,1)',
+            data: [65, 59, 80, 81, 56, 55, 40],
+        },
+    ],
 };
 
 
@@ -54,35 +54,35 @@ datasets: [
 const line = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
-      {
-        label: 'My First dataset',
-        fill: false,
-        lineTension: 0.1,
-        backgroundColor: 'rgba(75,192,192,0.4)',
-        borderColor: 'rgba(75,192,192,1)',
-        borderCapStyle: 'butt',
-        borderDash: [],
-        borderDashOffset: 0.0,
-        borderJoinStyle: 'miter',
-        pointBorderColor: 'rgba(75,192,192,1)',
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 1,
-        pointHoverRadius: 5,
-        pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-        pointHoverBorderColor: 'rgba(220,220,220,1)',
-        pointHoverBorderWidth: 2,
-        pointRadius: 1,
-        pointHitRadius: 10,
-        data: [65, 59, 80, 81, 56, 55, 40],
-      },
+        {
+            label: 'My First dataset',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: [65, 59, 80, 81, 56, 55, 40],
+        },
     ],
-  };
+};
 const options = {
-tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-},
-maintainAspectRatio: false
+    tooltips: {
+        enabled: false,
+        custom: CustomTooltips
+    },
+    maintainAspectRatio: false
 }
 
 class Purchases extends Component {
@@ -99,22 +99,19 @@ class Purchases extends Component {
                         <AppSidebarForm />
                         <AppSidebarNav navConfig={navigation} {...this.props} />
                         <AppSidebarFooter />
-                        <AppSidebarMinimizer />            
+                        <AppSidebarMinimizer />
                     </AppSidebar>
                     <main className="main">
-                    <AppBreadcrumb appRoutes={routes} />
-                  
-                         <div style={padding} className="animated fadeIn">
-                            
+                        <AppBreadcrumb appRoutes={routes} />
+                        <div style={padding} className="animated fadeIn">
                             <Row>
-                            
                                 <Col>
                                     <Card className="text-white bg-primary">
                                         <CardHeader>
                                             <div className="text-value">Overview</div>
                                         </CardHeader>
                                         <CardBody className="pb-0 bg-info">
-                                        <Row>
+                                            <Row>
                                                 <Col>
                                                     <div className="text-value">Total Purchases</div>
                                                     <div style={paddingCard}>125.000 €</div>
@@ -128,12 +125,12 @@ class Purchases extends Component {
                                     </Card>
                                 </Col>
                                 <Col>
-                                <Card>
-              <CardHeader>
-                Top Suppliers
-              </CardHeader>
-              <CardBody>
-              <Table responsive size="sm">
+                                    <Card>
+                                        <CardHeader>
+                                            Top Suppliers
+                                        </CardHeader>
+                                        <CardBody>
+                                            <Table responsive size="sm">
                                                 <thead>
                                                     <tr>
                                                         <th>Username</th>
@@ -169,31 +166,28 @@ class Purchases extends Component {
                                                     </tr>
                                                 </tbody>
                                             </Table>
-              </CardBody>
-            </Card>
-                                </Col> 
+                                        </CardBody>
+                                    </Card>
+                                </Col>
                             </Row>
                             <Row>
-                            <Col xs="12" lg="12">
-                            <Card>
-               <CardHeader>
-              Line Chart
-              <div className="card-header-actions">
-                <a href="http://www.chartjs.org" className="card-header-action">
-                  <small className="text-muted">docs</small>
-                </a>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <div className="chart-wrapper">
-                <Line data={line} height ={250} options={options} />
-              </div>
-            </CardBody>
-          </Card>
+                                <Col xs="12" lg="12">
+                                    <Card>
+                                        <CardHeader>
+                                            Line Chart
+                                            <div className="card-header-actions">
+                                            <a href="http://www.chartjs.org" className="card-header-action">
+                                                <small className="text-muted">docs</small>
+                                            </a>
+                                            </div>
+                                        </CardHeader>
+                                        <CardBody>
+                                            <div className="chart-wrapper">
+                                                <Line data={line} height={100} options={options} />
+                                            </div>
+                                        </CardBody>
+                                    </Card>
                                 </Col>
-
-
-
                             </Row>
                         </div>
 
@@ -202,7 +196,7 @@ class Purchases extends Component {
                 <AppFooter>
                     <DefaultFooter />
                 </AppFooter>
-            </div>  
+            </div>
         );
     }
 }

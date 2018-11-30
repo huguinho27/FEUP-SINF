@@ -30,6 +30,10 @@ const padding= {
     paddingRight: '20px'
 };
 
+const paddingCard = {
+    paddingBottom: '20px'
+}
+
 class Inventory extends Component {
     render() {
         return (
@@ -55,9 +59,12 @@ class Inventory extends Component {
 
                             <Col lg="6">
                                 <Card className="text-white bg-info">
+                                    <CardHeader>
+                                        <div className="text-value">Inventory Value</div>
+                                    </CardHeader>
                                     <CardBody className="pb-0">
-                                        <div className="text-value">125.000 €</div>
-                                        <div>Inventory Value</div>
+                                        <div style={paddingCard} className="text-value">125.000 €</div>
+                                        {/* <div>Inventory Value</div> */}
                                     </CardBody>
                                 </Card>
                                 <Card>

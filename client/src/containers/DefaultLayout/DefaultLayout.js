@@ -31,6 +31,10 @@ import { callbackify } from 'util';
 //<Redirect from="/" to="/dashboard" />
 //^ botar isto antes do </Switch>
 
+const paddingCard = {
+    paddingBottom: '20px'
+}
+
 const pie1 = {
     labels: [
         'Red',
@@ -134,7 +138,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
                                         <div className="text-value">{this.state.totalSales} €</div>
-                                        <div>Total Sales</div>
+                                        <div style={paddingCard}>Total Sales</div>
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -142,8 +146,8 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
-                                        <div className="text-value">69.420 €</div>
-                                        <div>Total Purchases</div>                                        
+                                        <div className="text-value">Total Purchases</div>
+                                        <div style={paddingCard}>69.420 €</div>                                        
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -151,8 +155,8 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text-white bg-warning">
                                     <CardBody className="pb-0">
-                                        <div className="text-value">44.46 %</div>
-                                        <div>Gross Profit</div>
+                                        <div className="text-value">Gross Profit</div>
+                                        <div style={paddingCard}>44.46 %</div>
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -160,8 +164,8 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text.white bg-danger">
                                     <CardBody className="pb-0">
-                                        <div className="text-value">264.000 €</div>
-                                        <div>Inventory Value</div>
+                                        <div className="text-value">Inventory Value</div>
+                                        <div style={paddingCard}>264.000 €</div>
                                     </CardBody>        
                                 </Card>
                             </Col>

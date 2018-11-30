@@ -30,6 +30,10 @@ const padding= {
     paddingRight: '20px'
 };
 
+const paddingCard = {
+    paddingBottom: '20px'
+}
+
 const line = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
@@ -94,9 +98,9 @@ class Finances extends Component {
                                         </CardHeader>
                                         <CardBody className="pb-0 bg-info">
                                             <div className="text-value">Sales and Revenue:</div>
-                                            <div>420 hehe xd</div>
+                                            <div style={paddingCard}>420 hehe xd</div>
                                             <div className="text-value">Operating Costs:</div>
-                                            <div>666 haha</div>
+                                            <div style={paddingCard}>666 haha</div>
                                         </CardBody>
                                     </Card>
                                 </Col>
