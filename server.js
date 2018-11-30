@@ -5,10 +5,24 @@ let request = require('request');
 const app = express();
 const port = process.env.PORT || 5000;
 
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : '',
+  database : 'sinfdemo'
+});
+
+function connectDB() { 
+ if (connection.state === 'disconnected') {
+   connection.connect();
+ }
+}
+
 /**
  * Get customers from DB
  */
 app.get('/customers', (req, res)=>{
+  connectDB();
   connection.query('SELECT CustomerID, AccountID, CustomerID, CompanyName, BillingAddressDetail, ' + 
   'BillingCity, BillingPostalCode, BillingCountry, ShipToAddressDetail, ShipToCity, ShipToPostalCode, ' +
   'ShipToCountry, Telephone, Fax, Website FROM customers', (error, results, fields)=>{
@@ -22,9 +36,10 @@ app.get('/customers', (req, res)=>{
  * Get invoices from DB
  */
 app.get('/invoices', (req, res)=>{
-  connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.InvoiceDate, salesInvoices.GrossTotal, ' +
-  'customers.CompanyName FROM salesInvoices, customers' + 
-  'WHERE salesInvoices.CustomerID = customers.CustomerID', (error, results, fields)=>{
+  connectDB();
+  connection.query('SELECT salesinvoices.InvoiceNo, salesinvoices.InvoiceDate, salesinvoices.GrossTotal, ' +
+  'customers.CompanyName FROM salesinvoices, customers' + 
+  'WHERE salesinvoices.CustomerID = customers.CustomerID', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
     res.send(results);
@@ -35,6 +50,7 @@ app.get('/invoices', (req, res)=>{
  * Get products from DB
  */
 app.get('/products', (req, res)=>{
+  connectDB();
   connection.query('SELECT * FROM products', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
@@ -46,6 +62,7 @@ app.get('/products', (req, res)=>{
  * Get sales from DB
  */
 app.get('/sales', (req, res)=>{
+  connectDB();
   connection.query('SELECT salesInvoices.InvoiceNo, products.ProductType, products.ProductCode, products.ProductGroup, ' +
   'products.ProductDescription, salesLines.UnitPrice, salesLines.CreditAmount FROM salesLines INNER JOIN salesInvoices ' +
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
@@ -60,6 +77,7 @@ app.get('/sales', (req, res)=>{
  * Get suppliers from DB
  */
 app.get('/suppliers', (req, res)=>{
+  connectDB();
   connection.query('SELECT SupplierID, AccountID, SupplierTaxID, CompanyName, BillingAddressDetail, BillingCity, ' +
   'BillingPostalCode, BillingCountry, ShipFromAddressDetail, ShipFromCity, ShipFromPostalCode, ShipFromCountry, ' +
   'Telephone, Fax, Website FROM suppliers', (error, results, fields)=>{
@@ -73,15 +91,6 @@ app.get('/suppliers', (req, res)=>{
  * Get purchases from Primavera WebApi
  */
 app.get('/purchases', (req, res)=>{
-
-  var connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : '',
-    database : 'sinfdemo'
-  });
-  connection.connect();
-
 
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
@@ -124,10 +133,13 @@ app.get('/purchases', (req, res)=>{
     };
   
     request(options2, (error2, results2)=> {
-      if (error2){
+      if (error2) {
         console.log(error2);
       }
       console.log(results2.body);
+      res.set('Content-Type', 'application/json');
+      res.status(200);
+      res.send(results2.body);
     });
   });
 });
