@@ -54,12 +54,14 @@ class Sales extends Component {
         super(props);
 
         this.state = {
-            salesYTD: null
+            salesYTD: null,
+            customerSales: [{},{}],
         }
     }
 
     componentWillMount() {
         this.fetchSales();
+        this.fetchCustomerSales();
     }
 
     fetchSales() {
@@ -79,18 +81,44 @@ class Sales extends Component {
         .catch(function(err){
             console.log(err);
         })
-        .then((json) => this.populateDataset(json))
+        .then((json) => this.populateSalesYTD(json))
     }
     
-    populateDataset(json) {
-        let data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    populateSalesYTD(json) {
+        let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
             let month = parseInt(json[i].InvoiceDate.split("-")[1]);
-    
-            data[month-1] += Math.floor(json[i].CreditAmount);
+
+            data[month-1] += json[i].CreditAmount;
         }
 
+        for (let i = 0; i < data.length; i++) {
+            data[i] = Number(Math.round(data[i]+'e2')+'e-2');
+        }
+
+        //console.log(data);
+
         this.setState({salesYTD: data});
+    }
+
+    fetchCustomerSales() {
+        fetch('http://localhost:5000/customerSales', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.setState({customerSales: json}))
     }
 
     render() {
@@ -171,37 +199,20 @@ class Sales extends Component {
                                             <Table responsive size="sm">
                                                 <thead>
                                                     <tr>
-                                                        <th>Username</th>
-                                                        <th>Date registered</th>
+                                                        <th>Company Name</th>
                                                         <th>Sales</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>Carwyn Fachtna</td>
-                                                        <td>2012/01/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Nehemiah Tatius</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Staff</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Ebbe Gemariah</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Admin</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Eustorgios Amulius</td>
-                                                        <td>2012/03/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Leopold Gáspár</td>
-                                                        <td>2012/01/21</td>
-                                                        <td>Staff</td>
-                                                    </tr>
+                                                    {this.state.customerSales.map(function(item, key) {
+                                                        return (
+                                                            <tr key = {key}>
+                                                                <td>{item.CompanyName}</td>
+                                                                <td>{item.GrossTotal}</td>
+                                                            </tr>
+                                                        )
+                                                    
+                                                    })}
                                                 </tbody>
                                             </Table>
                                         </CardBody>
