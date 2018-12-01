@@ -326,12 +326,6 @@ app.get('/dashboard', (req, res)=>{
       });
     });
   });
-
-  /*
-  let dashboard = {
-    totalSales: results2.body
-  };
-  */
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

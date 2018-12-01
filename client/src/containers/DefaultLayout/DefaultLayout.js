@@ -242,7 +242,7 @@ class DefaultLayout extends Component {
                             </Col>
 
                             <Col xs="12" sm="6" lg="3">
-                                <Card className="text-white bg-warning">
+                                <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Gross Profit</div>
                                         <div style={paddingCard}>44.46 %</div>
@@ -251,7 +251,7 @@ class DefaultLayout extends Component {
                             </Col>
 
                             <Col xs="12" sm="6" lg="3">
-                                <Card className="text.white bg-danger">
+                                <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Inventory Value</div>
                                         <div style={paddingCard}>264.000 €</div>
