@@ -5,8 +5,8 @@ let request = require('request');
 const app = express();
 const port = process.env.PORT || 5000;
 
-//const hostname = '10.227.149.42';
-const hostname = '10.227.150.73';
+const hostname = '10.227.151.135';
+//const hostname = '10.227.150.73';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -94,6 +94,8 @@ app.get('/sales', (req, res)=>{
     res.send(results);
   });
 });
+
+
 
 /**
  * Get suppliers from DB
@@ -242,9 +244,58 @@ app.get('/dashboard/purchases/total', (req,res)=>{
   });
 });
 
-/*app.get('/dashboard/inventoryvalue', (req, res) => {
+app.get('/purchases/ytd', (req, res)=> {
+  let headers = {
+    'Content-type': 'application/x-www-form-urlencoded'
+  };
+
+  let options = {
+    method: 'post',
+    form: {
+      username: 'feup',
+      password: 'qualquer1',
+      company: 'DEMO',
+      instance: 'Default',
+      grant_type: 'password',
+      line: 'professional'
+    },
+    url: 'http://' + hostname + ':2018/WebApi/token',
+    headers
+  };
+
+  //Request to get authentication token
+  request(options, (error1, results1)=> {
+    if (error1) throw error1;
+    let parsedAuthentication = JSON.parse(results1.body);
+    let bearerToken = parsedAuthentication.access_token;
+    let bearer = parsedAuthentication.token_type;
+    
+    //Request to get purchases, providing the token
+    let headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer' + ' ' + bearerToken
+    };
   
-});*/
+    let options2 = {
+      headers,
+      method: 'get',
+      url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
+      body: '"Select TotalMerc, DataDoc FROM CabecCompras where DataDoc >= \' 2018-01-01T00:00:00 \' "'
+    };
+  
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        console.log(error2);
+      }
+      let obj = results2;
+      let obj2 = JSON.parse(results2.body);
+      console.log('primavera ', results2);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.send(obj2.DataSet.Table);
+    });
+  });
+});
 
 app.get('/dashboard', (req, res)=>{
   connectDB();

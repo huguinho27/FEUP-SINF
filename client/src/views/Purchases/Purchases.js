@@ -100,9 +100,45 @@ class Purchases extends Component {
     }
 
     componentWillMount() {
-        //this.fetchSales();
+        this.fetchPurchasesChart();
         this.fetchSuppliers();
         this.fetchTotalPurchases();
+    }
+
+    fetchPurchasesChart() {
+      fetch('http://localhost:5000/purchases/ytd', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => /*this.populatePurchases(json)*/ console.log(json))
+    }
+
+    populatePurchases(json){
+      let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
+        for (let i = 0; i < json.length; i++) {
+            let month = parseInt(json[i].DataDoc.split("-")[1]);
+
+            data[month-1] += json[i].TotalMerc;
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            data[i] = Number(Math.round(data[i]+'e2')+'e-2');
+        }
+
+        this.setState({purchasesYTD: data});
     }
 
     fetchTotalPurchases() {
