@@ -173,6 +173,7 @@ app.get('/dashboard/suppliers', (req, res)=>{
   connectDB();
   connection.query('SELECT Website, CompanyName, BillingAddressDetail FROM suppliers', (error, results, fields)=> {
     if (error) throw error;
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.send(results);
   });
 });
@@ -235,6 +236,7 @@ app.get('/dashboard/purchases/total', (req,res)=>{
       let obj = results2;
       let obj2 = JSON.parse(results2.body);
       console.log(results2);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
       res.send(obj2.DataSet.Table[0]);
     });
   });

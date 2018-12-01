@@ -44,21 +44,6 @@ const rowPadding = {
     paddingBottom: '20px'
 }
 
-const bar = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
-        {
-            label: 'My First dataset',
-            backgroundColor: 'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-            hoverBorderColor: 'rgba(255,99,132,1)',
-            data: [65, 59, 80, 81, 56, 55, 40],
-        },
-    ],
-};
-
 const years = [
     '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
 ]
@@ -104,7 +89,90 @@ const options = {
 }
 
 class Purchases extends Component {
+    constructor (props) {
+        super(props);
+
+        this.state = {
+            purchasesYTD: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            suppliers: [{},{}],
+            totalPurchases: "0",
+        }
+    }
+
+    componentWillMount() {
+        //this.fetchSales();
+        this.fetchSuppliers();
+        this.fetchTotalPurchases();
+    }
+
+    fetchTotalPurchases() {
+        fetch('http://localhost:5000/dashboard/purchases/total', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.setState({totalPurchases: Math.floor(json.Column1).toLocaleString()}))
+    }
+
+    fetchSuppliers() {
+        fetch('http://localhost:5000/dashboard/suppliers',
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.setState({suppliers: json}))
+    }
+
     render() {
+        var bar = {
+            labels: [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ],
+            datasets: [
+                {
+                    label: 'Purchases YTD',
+                    backgroundColor: 'rgba(255,99,132,0.2)',
+                    borderColor: 'rgba(255,99,132,1)',
+                    borderWidth: 1,
+                    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                    hoverBorderColor: 'rgba(255,99,132,1)',
+                    data: this.state.purchasesYTD,
+                },
+            ],
+        }
         return (
             <div className="app">
                 <AppHeader fixed>
@@ -157,7 +225,7 @@ class Purchases extends Component {
                                             <Row>
                                                 <Col>
                                                     <div className="text-value">Total Purchases</div>
-                                                    <div style={paddingCard}>125.000 €</div>
+                                                    <div style={paddingCard}> {this.state.totalPurchases} €</div>
                                                 </Col>
                                                 <Col>
                                                     <div className="text-value">Growth</div>
@@ -176,37 +244,22 @@ class Purchases extends Component {
                                             <Table responsive size="sm">
                                                 <thead>
                                                     <tr>
-                                                        <th>Username</th>
-                                                        <th>Date registered</th>
-                                                        <th>Purchases</th>
+                                                        <th>CompanyName</th>
+                                                        <th>Billing Address Detail</th>
+                                                        <th>Website</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>Carwyn Fachtna</td>
-                                                        <td>2012/01/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Nehemiah Tatius</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Staff</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Ebbe Gemariah</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Admin</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Eustorgios Amulius</td>
-                                                        <td>2012/03/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Leopold Gáspár</td>
-                                                        <td>2012/01/21</td>
-                                                        <td>Staff</td>
-                                                    </tr>
+                                                    {this.state.suppliers.map(function(item, key) {
+                                                        return (
+                                                            <tr key = {key}>
+                                                                <td>{item.CompanyName}</td>
+                                                                <td>{item.BillingAddressDetail}</td>
+                                                                <td>{item.Website}</td>
+                                                            </tr>
+                                                        )
+                                                    
+                                                    })}
                                                 </tbody>
                                             </Table>
                                         </CardBody>
