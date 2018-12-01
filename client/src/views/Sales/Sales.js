@@ -76,12 +76,14 @@ class Sales extends Component {
         this.state = {
             salesYTD: null,
             customerSales: [{},{}],
+            totalSales: "0",
         }
     }
 
     componentWillMount() {
         this.fetchSales();
         this.fetchCustomerSales();
+        this.fetchTotalSales();
     }
 
     fetchSales() {
@@ -139,6 +141,26 @@ class Sales extends Component {
             console.log(err);
         })
         .then((json) => this.setState({customerSales: json}))
+    }
+
+    fetchTotalSales() {
+        fetch('http://localhost:5000/dashboard/sales/total', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.setState({totalSales: Math.floor(json[0]['sum(CreditAmount)']).toLocaleString()}))
     }
 
     render() {
@@ -222,7 +244,7 @@ class Sales extends Component {
                                             <Row>
                                                 <Col>
                                                     <div className="text-value">Total Sales</div>
-                                                    <div style={paddingCard}>125.000 €</div>
+                                                    <div style={paddingCard}>{this.state.totalSales} €</div>
                                                 </Col>
                                                 <Col>
                                                     <div className="text-value">Growth</div>
