@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody, CardHeader } from 'reactstrap';
+import { Container, Row, Col, Card, CardBody, CardHeader, Table } from 'reactstrap';
 import { Pie } from 'react-chartjs-2';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -37,6 +37,11 @@ const paddingCard = {
     paddingBottom: '20px'
 }
 
+const darkblue = '#000066';
+const blue = '#3366ff';
+const lightpurple = '#9933ff';
+const bluedgreen = '#009999';
+const grey = '#666699';
 const padding = {
     paddingLeft: '20px',
     paddingRight: '20px',
@@ -96,18 +101,20 @@ const months = [
 ]
 const defaultMonth = months[4]
 
-var totalSales = 0;
 
 class DefaultLayout extends Component {
     constructor (props) {
       super(props);
 
       this.state = {
-        totalSales,
+        totalSales: 0,
+        totalPurchases: 0,
+        topCustomersCompany : [0,0,0,0,0],
+        topCustomersTotal: [0,0,0,0,0]
       };
     }
     fetchData(event) {
-      fetch('http://localhost:5000/dashboard')
+      fetch('http://localhost:5000/dashboard', {mode: 'cors'})
       .then(function(response) {
         if (response.status >= 400) {
            throw new Error("Bad response from server");
@@ -115,16 +122,37 @@ class DefaultLayout extends Component {
         return response.json();
       })
       .catch(function(err){
-        console.log(err);
+        console.log('Error: ', err);
       })
-      .then((json) => this.setState({
-        totalSales: json.totalSales
-      }))
+      .then((json) => {
+        console.log(json.topCustomersCompany);
+        console.log(json.topCustomersTotal);
+        this.setState({
+        totalSales: json.totalSales,
+        totalPurchases: json.totalPurchases,
+        topCustomersCompany: json.topCustomersCompany,
+        topCustomersTotal: json.topCustomersTotal
+      })
+    })
     }
-    componentDidMount() {
+    componentWillMount() {
       this.fetchData();
     }
     render() {
+      var pie1 = {
+        labels: this.state.topCustomersCompany,
+        datasets: [
+            {
+                data: this.state.topCustomersTotal,
+                backgroundColor: [
+                  bluedgreen,
+                  darkblue,
+                  lightpurple,
+                  blue,
+                  grey
+                ],
+            }],
+      };
         return (
             <div className="app">
                 <AppHeader fixed>
@@ -192,7 +220,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Total Purchases</div>
-                                        <div style={paddingCard}>69.420 €</div>                                        
+                                        <div style={paddingCard}>{this.state.totalPurchases} €</div>                                        
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -220,12 +248,7 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6">
                                 <Card>
                                     <CardHeader>
-                                        Pie Chart 1
-                                        <div className="card-header-actions">
-                                            <a href="https://www.chartjs.org" className="card-header-action">
-                                                <small className="text-muted">docs</small>
-                                            </a>
-                                        </div>
+                                        Top Customers
                                     </CardHeader>
                                     <CardBody>
                                         <div className="chart-wrapper">
@@ -235,20 +258,48 @@ class DefaultLayout extends Component {
                                 </Card>
                             </Col>
                             <Col xs="12" sm="6">
-                                <Card>
-                                    <CardHeader>
-                                        Pie Chart 2
-                                        <div className="card-header-actions">
-                                            <a href="https://www.chartjs.org" className="card-header-action">
-                                                <small className="text-muted">docs</small>
-                                            </a>
-                                        </div>
-                                    </CardHeader>
-                                    <CardBody>
-                                        <div className="chart-wrapper">
-                                            <Pie data={pie2} />
-                                        </div>
-                                    </CardBody>
+                            <Card>
+                                <CardHeader>
+                                    <i className="fa fa-align-justify"></i> Products in inventory
+                                </CardHeader>
+                                <CardBody>
+                                    <Table responsive striped>
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value per Unit</th>
+                                        <th>Quantity</th>
+                                        <th>Total Value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Powerbank Miaomi Mi 2C</td>
+                                        <td>24 €</td>
+                                        <td>220</td>
+                                        <td>5,280 €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Memória RAM G.Skill V 16GB </td>
+                                        <td>156 €</td>
+                                        <td>140</td>
+                                        <td>21,000 €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Router Asus RT-AX88U</td>
+                                        <td>428 €</td>
+                                        <td>70</td>
+                                        <td>29,960 €</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Portátil PNY Prevail Pro</td>
+                                        <td>799 €</td> 
+                                        <td>22</td>
+                                        <td>17,578 €</td>
+                                    </tr>
+                                    </tbody>
+                                    </Table>
+                                </CardBody>
                                 </Card>
                             </Col>
                         </Row>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader, Badge, Table } from 'reactstrap';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -217,7 +217,7 @@ class Purchases extends Component {
                                 <Col xs="12" lg="12">
                                     <Card>
                                         <CardHeader>
-                                            Line Chart
+                                            Bar Chart
                                             <div className="card-header-actions">
                                             <a href="http://www.chartjs.org" className="card-header-action">
                                                 <small className="text-muted">docs</small>
@@ -226,7 +226,7 @@ class Purchases extends Component {
                                         </CardHeader>
                                         <CardBody>
                                             <div className="chart-wrapper">
-                                                <Line data={line} height={100} options={options} />
+                                                <Bar data={bar} height={100} options={options} />
                                             </div>
                                         </CardBody>
                                     </Card>
