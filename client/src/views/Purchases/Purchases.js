@@ -3,6 +3,8 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader, Badge, Table } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 
 import {
     AppBreadcrumb,
@@ -33,6 +35,15 @@ const padding = {
 const paddingCard = {
     paddingBottom: '20px'
 }
+
+const topPadding = {
+    paddingTop: '7px',
+}
+
+const rowPadding = {
+    paddingBottom: '20px'
+}
+
 const bar = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
     datasets: [
@@ -48,6 +59,42 @@ const bar = {
     ],
 };
 
+const years = [
+    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
+]
+const defaultYear = years[8]
+const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+
+]
+const defaultMonth = months[4]
+
+const line = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [
+        {
+            label: 'My First dataset',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: [65, 59, 80, 81, 56, 55, 40],
+        },
+    ],
+};
 const options = {
     tooltips: {
         enabled: false,
@@ -74,7 +121,32 @@ class Purchases extends Component {
                     </AppSidebar>
                     <main className="main">
                         <AppBreadcrumb appRoutes={routes} />
+
                         <div style={padding} className="animated fadeIn">
+
+                        <div style={rowPadding}>
+                                <Row>
+                                    <Col xs="0" sm="1" lg="1">
+                                        <div style={topPadding}>Timespan:</div>
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2">
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    
+                                    </Col>
+                                    <Col xs="1" sm="1" lg="1">
+                                        <div style={topPadding}> until </div></Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    </Col>
+                                </Row>
+                            </div>
+                            
                             <Row>
                                 <Col>
                                     <Card className="text-white bg-primary">

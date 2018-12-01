@@ -3,6 +3,10 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader, Table, Badge } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import 'whatwg-fetch';
+import 'isomorphic-fetch';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 
 import {
     AppBreadcrumb,
@@ -34,21 +38,18 @@ const paddingCard = {
     paddingBottom: '20px'
 }
 
+const topPadding = {
+    paddingTop: '7px',
+}
 
-const bar = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
-        {
-            label: 'My First dataset',
-            backgroundColor: 'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-            hoverBorderColor: 'rgba(255,99,132,1)',
-            data: [65, 59, 80, 81, 56, 55, 40],
-        },
-    ],
-};
+const rowPadding = {
+    paddingBottom: '20px'
+}
+
+var sale = {
+    InvoiceDate: '',
+    CreditAmount: 0,
+}
 
 const options = {
     tooltips: {
@@ -58,8 +59,117 @@ const options = {
     maintainAspectRatio: false
 }
 
+const years = [
+    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
+]
+const defaultYear = years[8]
+const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+
+]
+const defaultMonth = months[4]
+
 class Sales extends Component {
+    constructor (props) {
+        super(props);
+
+        this.state = {
+            salesYTD: null,
+            customerSales: [{},{}],
+        }
+    }
+
+    componentWillMount() {
+        this.fetchSales();
+        this.fetchCustomerSales();
+    }
+
+    fetchSales() {
+        fetch('http://localhost:5000/sales', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.populateSalesYTD(json))
+    }
+    
+    populateSalesYTD(json) {
+        let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
+        for (let i = 0; i < json.length; i++) {
+            let month = parseInt(json[i].InvoiceDate.split("-")[1]);
+
+            data[month-1] += json[i].CreditAmount;
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            data[i] = Number(Math.round(data[i]+'e2')+'e-2');
+        }
+
+        //console.log(data);
+
+        this.setState({salesYTD: data});
+    }
+
+    fetchCustomerSales() {
+        fetch('http://localhost:5000/customerSales', 
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+        })
+        .then(function(response) {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .catch(function(err){
+            console.log(err);
+        })
+        .then((json) => this.setState({customerSales: json}))
+    }
+
     render() {
+        var bar = {
+            labels: [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ],
+            datasets: [
+                {
+                    label: 'Sales YTD',
+                    backgroundColor: 'rgba(255,99,132,0.2)',
+                    borderColor: 'rgba(255,99,132,1)',
+                    borderWidth: 1,
+                    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                    hoverBorderColor: 'rgba(255,99,132,1)',
+                    data: this.state.salesYTD,
+                },
+            ],
+        }
+
         return (
             <div className="app">
                 <AppHeader fixed>
@@ -78,6 +188,29 @@ class Sales extends Component {
                         <AppBreadcrumb appRoutes={routes} />
 
                         <div style={padding} className="animated fadeIn">
+
+                            <div style={rowPadding}>
+                                <Row>
+                                    <Col xs="0" sm="1" lg="1">
+                                        <div style={topPadding}>Timespan:</div>
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2">
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    
+                                    </Col>
+                                    <Col xs="1" sm="1" lg="1">
+                                        <div style={topPadding}> until </div></Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    </Col>
+                                </Row>
+                            </div>
 
                             <Row>
                                 <Col>
@@ -109,37 +242,20 @@ class Sales extends Component {
                                             <Table responsive size="sm">
                                                 <thead>
                                                     <tr>
-                                                        <th>Username</th>
-                                                        <th>Date registered</th>
+                                                        <th>Company Name</th>
                                                         <th>Sales</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>Carwyn Fachtna</td>
-                                                        <td>2012/01/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Nehemiah Tatius</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Staff</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Ebbe Gemariah</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Admin</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Eustorgios Amulius</td>
-                                                        <td>2012/03/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Leopold Gáspár</td>
-                                                        <td>2012/01/21</td>
-                                                        <td>Staff</td>
-                                                    </tr>
+                                                    {this.state.customerSales.map(function(item, key) {
+                                                        return (
+                                                            <tr key = {key}>
+                                                                <td>{item.CompanyName}</td>
+                                                                <td>{item.GrossTotal}</td>
+                                                            </tr>
+                                                        )
+                                                    
+                                                    })}
                                                 </tbody>
                                             </Table>
                                         </CardBody>
@@ -152,7 +268,7 @@ class Sales extends Component {
                                 <Col xs="12" sm="6" lg="12">
                                     <Card>
                                         <CardHeader>
-                                            Bar Chart
+                                            Sales YTD
                                         <div className="card-header-actions">
                                                 <a href="http://www.chartjs.org" className="card-header-action">
                                                     <small className="text-muted">docs</small>
