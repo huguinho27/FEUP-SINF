@@ -17,6 +17,12 @@ import {
 // import { renderRoutes } from 'react-router-config';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    
+  }
+
   render() {
     return (
         <HashRouter>
