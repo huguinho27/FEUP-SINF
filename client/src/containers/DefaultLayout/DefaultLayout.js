@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader } from 'reactstrap';
 import { Pie } from 'react-chartjs-2';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
 import 'whatwg-fetch';
 import 'isomorphic-fetch';
 
@@ -32,6 +34,21 @@ import { callbackify } from 'util';
 //^ botar isto antes do </Switch>
 
 const paddingCard = {
+    paddingBottom: '20px'
+}
+
+const padding = {
+    paddingLeft: '20px',
+    paddingRight: '20px',
+    paddingTop: '20px'
+};
+
+
+const topPadding = {
+    paddingTop: '7px',
+}
+
+const rowPadding = {
     paddingBottom: '20px'
 }
 
@@ -69,11 +86,15 @@ const pie2 = {
         }],
 };
 
-const padding = {
-    paddingLeft: '20px',
-    paddingRight: '20px',
-    paddingTop: '20px'
-};
+const years = [
+    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
+]
+const defaultYear = years[8]
+const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+
+]
+const defaultMonth = months[4]
 
 var totalSales = 0;
 
@@ -131,14 +152,38 @@ class DefaultLayout extends Component {
                         
                         </Switch>
                     </Container>
+                        
                         <div style={padding} className="animated fadeIn">
 
+                            <div style={rowPadding}>
+                                <Row>
+                                    <Col xs="0" sm="1" lg="1">
+                                        <div style={topPadding}>Timespan:</div>
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2">
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    
+                                    </Col>
+                                    <Col xs="1" sm="1" lg="1">
+                                        <div style={topPadding}> until </div></Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                    </Col>
+                                    <Col xs="6" sm="5" lg="2" >
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                    </Col>
+                                </Row>
+                            </div>
+                            
                         <Row>
                             <Col xs="12" sm="6" lg="3">
                                 <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
-                                        <div className="text-value">{this.state.totalSales} €</div>
-                                        <div style={paddingCard}>Total Sales</div>
+                                        <div className="text-value">Total Sales</div>
+                                        <div style={paddingCard}>{this.state.totalSales} €</div>
                                     </CardBody>
                                 </Card>
                             </Col>

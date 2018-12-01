@@ -58,11 +58,11 @@ class Inventory extends Component {
                         <Row>
 
                             <Col lg="6">
-                                <Card className="text-white bg-info">
+                                <Card className="text-white bg-primary">
                                     <CardHeader>
                                         <div className="text-value">Inventory Value</div>
                                     </CardHeader>
-                                    <CardBody className="pb-0">
+                                    <CardBody className="pb-0 bg-info">
                                         <div style={paddingCard} className="text-value">125.000 €</div>
                                         {/* <div>Inventory Value</div> */}
                                     </CardBody>
