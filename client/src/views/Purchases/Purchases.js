@@ -90,95 +90,54 @@ const options = {
 
 class Purchases extends Component {
     constructor (props) {
-        super(props);
+      super(props);
 
-        this.state = {
-            purchasesYTD: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            suppliers: [{},{}],
-            totalPurchases: "0",
-        }
+      this.state = {
+          purchasesYTD: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          suppliers: [{},{}],
+          totalPurchases: 0,
+      }
     }
 
     componentWillMount() {
-        this.fetchPurchasesChart();
-        this.fetchSuppliers();
-        this.fetchTotalPurchases();
+        this.fetchData();
     }
 
-    fetchPurchasesChart() {
-      fetch('http://localhost:5000/purchases/ytd', 
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                }
-        })
-        .then(function(response) {
-            if (response.status >= 400) {
-                throw new Error("Bad response from server");
-            }
-
-            return response.json();
-        })
-        .catch(function(err){
-            console.log(err);
-        })
-        .then((json) => this.populatePurchases(json))
+    fetchData() {
+      fetch('http://localhost:5000/purchases',)
+      .then(function(response) {
+        if (response.status >= 400) {
+            throw new Error("Bad response from server");
+        }
+        return response.json();
+      })
+      .catch(function(err){
+          console.log(err);
+      })
+      .then((json) => {
+        this.populatePurchases(json.chartData);
+        this.setState({
+          totalPurchases: json.purchases,
+          suppliers: json.suppliers
+        });
+        
+      })
     }
 
-    populatePurchases(json){
+    populatePurchases(json) {
+      console.log('hello');
       let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
             let month = parseInt(json[i].DataDoc.split("-")[1]);
 
-            data[month-1] += json[i].TotalMerc;
+            data[month-1] += json[i].Column1;
         }
 
         for (let i = 0; i < data.length; i++) {
             data[i] = Number(Math.round(data[i]+'e2')+'e-2');
         }
-
         this.setState({purchasesYTD: data});
-    }
-
-    fetchTotalPurchases() {
-        fetch('http://localhost:5000/dashboard/purchases/total', 
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                }
-        })
-        .then(function(response) {
-            if (response.status >= 400) {
-                throw new Error("Bad response from server");
-            }
-            return response.json();
-        })
-        .catch(function(err){
-            console.log(err);
-        })
-        .then((json) => this.setState({totalPurchases: Math.floor(json.Column1).toLocaleString()}))
-    }
-
-    fetchSuppliers() {
-        fetch('http://localhost:5000/dashboard/suppliers',
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                }
-        })
-        .then(function(response) {
-            if (response.status >= 400) {
-                throw new Error("Bad response from server");
-            }
-            return response.json();
-        })
-        .catch(function(err){
-            console.log(err);
-        })
-        .then((json) => this.setState({suppliers: json}))
+        console.log(this.state.purchasesYTD);
     }
 
     render() {
@@ -306,10 +265,10 @@ class Purchases extends Component {
                                 <Col xs="12" lg="12">
                                     <Card>
                                         <CardHeader>
-                                            Bar Chart
+                                            Purchases YTD
                                             <div className="card-header-actions">
-                                            <a href="http://www.chartjs.org" className="card-header-action">
-                                                <small className="text-muted">docs</small>
+                                            <a className="card-header-action">
+                                                <small className="text-muted"></small>
                                             </a>
                                             </div>
                                         </CardHeader>
