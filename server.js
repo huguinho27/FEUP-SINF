@@ -5,6 +5,9 @@ let request = require('request');
 const app = express();
 const port = process.env.PORT || 5000;
 
+//const hostname = '10.227.149.42';
+const hostname = '10.227.150.73';
+
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
@@ -125,7 +128,7 @@ app.get('/purchases', (req, res)=> {
       grant_type: 'password',
       line: 'professional'
     },
-    url: 'http://10.227.149.42:2018/WebApi/token',
+    url: 'http://' + hostname + ':2018/WebApi/token',
     headers
   };
 
@@ -146,7 +149,7 @@ app.get('/purchases', (req, res)=> {
     let options2 = {
       headers,
       method: 'get',
-      url: 'http://10.227.149.42:2018/WebApi/Administrador/Consulta',
+      url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
       body: '"Select DataVencimento, PrecoLiquido, Quantidade FROM LinhasCompras, CabecCompras '+
       'WHERE LinhasCompras.IdCabecCompras = CabecCompras.Id"'
     };
@@ -169,6 +172,7 @@ app.get('/dashboard/sales/total', (req,res)=>{
     if (error) throw error;
     res.set('Content-Type', 'application/json');
     res.status(200);
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.send(results);
   });
 });
@@ -188,7 +192,7 @@ app.get('/dashboard/purchases/total', (req,res)=>{
       grant_type: 'password',
       line: 'professional'
     },
-    url: 'http://10.227.149.42:2018/WebApi/token',
+    url: 'http://' + hostname + ':2018/WebApi/token',
     headers
   };
 
@@ -209,7 +213,7 @@ app.get('/dashboard/purchases/total', (req,res)=>{
     let options2 = {
       headers,
       method: 'get',
-      url: 'http://10.227.149.42:2018/WebApi/Administrador/Consulta',
+      url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
       body: '"SELECT abs(sum(TotalMerc)) FROM CabecCompras"'
     };
   
@@ -219,6 +223,7 @@ app.get('/dashboard/purchases/total', (req,res)=>{
       }
       let obj = results2;
       let obj2 = JSON.parse(results2.body);
+      console.log(results2);
       res.send(obj2.DataSet.Table[0]);
     });
   });
