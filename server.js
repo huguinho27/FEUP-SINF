@@ -5,8 +5,9 @@ let request = require('request');
 const app = express();
 const port = process.env.PORT || 5000;
 
-//const hostname = '10.227.149.42';
-const hostname = '10.227.150.73';
+//const hostname = '10.227.151.135';
+//const hostname = '10.227.150.73';
+const hostname = '192.168.1.134';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -14,24 +15,21 @@ var connection = mysql.createConnection({
   password : '',
   database : 'sinfdemo'
 });
+connection.connect();
 
-function connectDB() { 
- if (connection.state === 'disconnected') {
-   connection.connect();
- }
-}
 
 /**
  * Get customers from DB
  */
 app.get('/customers', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT CustomerID, AccountID, CustomerID, CompanyName, BillingAddressDetail, ' + 
   'BillingCity, BillingPostalCode, BillingCountry, ShipToAddressDetail, ShipToCity, ShipToPostalCode, ' +
   'ShipToCountry, Telephone, Fax, Website FROM customers', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
     res.send(results);
+    //connection.end();
   });
 });
 
@@ -39,7 +37,7 @@ app.get('/customers', (req, res)=>{
  * Get customers by sales value from DB
  */
 app.get('/customersales', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('select customers.CompanyName, salesinvoices.GrossTotal ' + 
           'from salesinvoices, customers ' + 
           ' where salesinvoices.CustomerID = customers.CustomerID ' + 
@@ -49,6 +47,7 @@ app.get('/customersales', (req, res)=>{
         (error, results, fields)=>{
     if (error) throw error;
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    //connection.end();
     res.send(results);
   });
 });
@@ -57,12 +56,13 @@ app.get('/customersales', (req, res)=>{
  * Get invoices from DB
  */
 app.get('/invoices', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT salesinvoices.InvoiceNo, salesinvoices.InvoiceDate, salesinvoices.GrossTotal, ' +
   'customers.CompanyName FROM salesinvoices, customers' + 
   'WHERE salesinvoices.CustomerID = customers.CustomerID', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
+    //connection.end();
     res.send(results);
   });
 });
@@ -71,10 +71,11 @@ app.get('/invoices', (req, res)=>{
  * Get products from DB
  */
 app.get('/products', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT * FROM products', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
+    //connection.end();
     res.send(results);
   });
 });
@@ -83,7 +84,7 @@ app.get('/products', (req, res)=>{
  * Get sales from DB
  */
 app.get('/sales', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.InvoiceDate, products.ProductType, products.ProductCode, products.ProductGroup, ' +
   'products.ProductDescription, salesLines.UnitPrice, salesLines.CreditAmount FROM salesLines INNER JOIN salesInvoices ' +
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
@@ -91,29 +92,29 @@ app.get('/sales', (req, res)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    //connection.end();
     res.send(results);
   });
 });
+
+
 
 /**
  * Get suppliers from DB
  */
 app.get('/suppliers', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT SupplierID, AccountID, SupplierTaxID, CompanyName, BillingAddressDetail, BillingCity, ' +
   'BillingPostalCode, BillingCountry, ShipFromAddressDetail, ShipFromCity, ShipFromPostalCode, ShipFromCountry, ' +
   'Telephone, Fax, Website FROM suppliers', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
+    //connection.end();
     res.send(results);
   });
 });
 
-/**
- * Get purchases from Primavera WebApi
- */
-app.get('/purchases', (req, res)=> {
-
+app.get('/purchases/ytd', (req,res)=>{
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
   };
@@ -150,18 +151,17 @@ app.get('/purchases', (req, res)=> {
       headers,
       method: 'get',
       url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
-      body: '"Select DataVencimento, PrecoLiquido, Quantidade FROM LinhasCompras, CabecCompras '+
-      'WHERE LinhasCompras.IdCabecCompras = CabecCompras.Id"'
+      body: '"Select abs(TotalMerc), DataDoc FROM CabecCompras where DataDoc >= \'2018-01-01T00:00:00\'"'
     };
   
     request(options2, (error2, results2)=> {
       if (error2) {
         console.log(error2);
       }
-      //console.log(results2.body);
-      res.set('Content-Type', 'application/json');
-      res.status(200);
-      res.send(results2.body);
+      let obj = results2;
+      let obj2 = JSON.parse(results2.body);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.send(obj2);
     });
   });
 });
@@ -170,20 +170,23 @@ app.get('/purchases', (req, res)=> {
  * Get suppliers from DB
  */
 app.get('/dashboard/suppliers', (req, res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT Website, CompanyName, BillingAddressDetail FROM suppliers', (error, results, fields)=> {
     if (error) throw error;
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    //connection.end();
     res.send(results);
   });
 });
 
 app.get('/dashboard/sales/total', (req,res)=>{
-  connectDB();
+  //connectDB();
   connection.query('SELECT sum(CreditAmount) FROM saleslines', (error, results, fields)=>{
     if (error) throw error;
     res.set('Content-Type', 'application/json');
     res.status(200);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    //connection.end();
     res.send(results);
   });
 });
@@ -234,18 +237,60 @@ app.get('/dashboard/purchases/total', (req,res)=>{
       }
       let obj = results2;
       let obj2 = JSON.parse(results2.body);
-      console.log(results2);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
       res.send(obj2.DataSet.Table[0]);
     });
   });
 });
 
-/*app.get('/dashboard/inventoryvalue', (req, res) => {
-  
-});*/
+/**
+ * Get purchases from Primavera WebApi
+ */
+app.get('/purchases', (req, res)=> {
+
+  let options = {
+    method: 'get',
+    url: 'http://localhost:5000/dashboard/purchases/total'
+  };
+  request(options, (error, results)=> {
+    if (error) {
+      console.log(error);
+    }
+    let obj = JSON.parse(results.body);
+    let purchasesTotal = obj.Column1;
+
+    let options2 = {
+      method: 'get',
+      url: 'http://localhost:5000/dashboard/suppliers'
+    };
+    request(options2, (error2, results2)=> {
+      if (error2) console.log(error2);
+      let suppliers = JSON.parse(results2.body);
+
+      let options3 = {
+        method: 'get',
+        url: 'http://localhost:5000/purchases/ytd'
+      };
+
+      request(options3, (error3, results3)=> {
+        if (error3) console.log(error3);
+        let purchasesChart = JSON.parse(results3.body).DataSet.Table;
+
+        let purchases = {
+          'purchases': purchasesTotal,
+          'suppliers': suppliers,
+          'chartData': purchasesChart
+        };
+        res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+        res.set('Content-Type', 'application/json');
+        res.send(JSON.stringify(purchases));
+      });
+    });
+  });
+});
 
 app.get('/dashboard', (req, res)=>{
-  connectDB();
+  //connectDB();
 
   //FIRST REQUEST - SALES
   let options = {
@@ -321,6 +366,7 @@ app.get('/dashboard', (req, res)=>{
           };
           res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
           res.set('Content-Type', 'application/json');
+          //connection.end();
           res.send(JSON.stringify(dashboard));
         });
       });

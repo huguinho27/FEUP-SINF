@@ -293,7 +293,7 @@ class Sales extends Component {
                                             Sales YTD
                                         <div className="card-header-actions">
                                                 <a href="http://www.chartjs.org" className="card-header-action">
-                                                    <small className="text-muted">docs</small>
+                                                    <small className="text-muted"></small>
                                                 </a>
                                             </div>
                                         </CardHeader>

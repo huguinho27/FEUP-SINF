@@ -44,21 +44,6 @@ const rowPadding = {
     paddingBottom: '20px'
 }
 
-const bar = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
-        {
-            label: 'My First dataset',
-            backgroundColor: 'rgba(255,99,132,0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            borderWidth: 1,
-            hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-            hoverBorderColor: 'rgba(255,99,132,1)',
-            data: [65, 59, 80, 81, 56, 55, 40],
-        },
-    ],
-};
-
 const years = [
     '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
 ]
@@ -104,7 +89,85 @@ const options = {
 }
 
 class Purchases extends Component {
+    constructor (props) {
+      super(props);
+
+      this.state = {
+          purchasesYTD: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          suppliers: [{},{}],
+          totalPurchases: 0,
+      }
+    }
+
+    componentWillMount() {
+        this.fetchData();
+    }
+
+    fetchData() {
+      fetch('http://localhost:5000/purchases',)
+      .then(function(response) {
+        if (response.status >= 400) {
+            throw new Error("Bad response from server");
+        }
+        return response.json();
+      })
+      .catch(function(err){
+          console.log(err);
+      })
+      .then((json) => {
+        this.populatePurchases(json.chartData);
+        this.setState({
+          totalPurchases: json.purchases,
+          suppliers: json.suppliers
+        });
+        
+      })
+    }
+
+    populatePurchases(json) {
+      console.log('hello');
+      let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
+        for (let i = 0; i < json.length; i++) {
+            let month = parseInt(json[i].DataDoc.split("-")[1]);
+
+            data[month-1] += json[i].Column1;
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            data[i] = Number(Math.round(data[i]+'e2')+'e-2');
+        }
+        this.setState({purchasesYTD: data});
+        console.log(this.state.purchasesYTD);
+    }
+
     render() {
+        var bar = {
+            labels: [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ],
+            datasets: [
+                {
+                    label: 'Purchases YTD',
+                    backgroundColor: 'rgba(255,99,132,0.2)',
+                    borderColor: 'rgba(255,99,132,1)',
+                    borderWidth: 1,
+                    hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+                    hoverBorderColor: 'rgba(255,99,132,1)',
+                    data: this.state.purchasesYTD,
+                },
+            ],
+        }
         return (
             <div className="app">
                 <AppHeader fixed>
@@ -157,7 +220,7 @@ class Purchases extends Component {
                                             <Row>
                                                 <Col>
                                                     <div className="text-value">Total Purchases</div>
-                                                    <div style={paddingCard}>125.000 €</div>
+                                                    <div style={paddingCard}> {this.state.totalPurchases} €</div>
                                                 </Col>
                                                 <Col>
                                                     <div className="text-value">Growth</div>
@@ -176,37 +239,22 @@ class Purchases extends Component {
                                             <Table responsive size="sm">
                                                 <thead>
                                                     <tr>
-                                                        <th>Username</th>
-                                                        <th>Date registered</th>
-                                                        <th>Purchases</th>
+                                                        <th>CompanyName</th>
+                                                        <th>Billing Address Detail</th>
+                                                        <th>Website</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>Carwyn Fachtna</td>
-                                                        <td>2012/01/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Nehemiah Tatius</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Staff</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Ebbe Gemariah</td>
-                                                        <td>2012/02/01</td>
-                                                        <td>Admin</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Eustorgios Amulius</td>
-                                                        <td>2012/03/01</td>
-                                                        <td>Member</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Leopold Gáspár</td>
-                                                        <td>2012/01/21</td>
-                                                        <td>Staff</td>
-                                                    </tr>
+                                                    {this.state.suppliers.map(function(item, key) {
+                                                        return (
+                                                            <tr key = {key}>
+                                                                <td>{item.CompanyName}</td>
+                                                                <td>{item.BillingAddressDetail}</td>
+                                                                <td>{item.Website}</td>
+                                                            </tr>
+                                                        )
+                                                    
+                                                    })}
                                                 </tbody>
                                             </Table>
                                         </CardBody>
@@ -217,10 +265,10 @@ class Purchases extends Component {
                                 <Col xs="12" lg="12">
                                     <Card>
                                         <CardHeader>
-                                            Bar Chart
+                                            Purchases YTD
                                             <div className="card-header-actions">
-                                            <a href="http://www.chartjs.org" className="card-header-action">
-                                                <small className="text-muted">docs</small>
+                                            <a className="card-header-action">
+                                                <small className="text-muted"></small>
                                             </a>
                                             </div>
                                         </CardHeader>
