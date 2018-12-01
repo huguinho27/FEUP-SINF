@@ -33,6 +33,24 @@ app.get('/customers', (req, res)=>{
 });
 
 /**
+ * Get customers by sales value from DB
+ */
+app.get('/customersales', (req, res)=>{
+  connectDB();
+  connection.query('select customers.CompanyName, salesinvoices.GrossTotal ' + 
+          'from salesinvoices, customers ' + 
+          ' where salesinvoices.CustomerID = customers.CustomerID ' + 
+          ' group by customers.CompanyName ' + 
+          ' order by salesinvoices.GrossTotal desc ' + 
+          ' limit 5;',
+        (error, results, fields)=>{
+    if (error) throw error;
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.send(results);
+  });
+});
+
+/**
  * Get invoices from DB
  */
 app.get('/invoices', (req, res)=>{
@@ -191,8 +209,7 @@ app.get('/dashboard/purchases/total', (req,res)=>{
       headers,
       method: 'get',
       url: 'http://10.227.149.42:2018/WebApi/Administrador/Consulta',
-      body: '"Select abs(sum(PrecoLiquido)) FROM LinhasCompras, CabecCompras '+
-      'WHERE LinhasCompras.IdCabecCompras = CabecCompras.Id"'
+      body: '"SELECT abs(sum(TotalMerc)) FROM CabecCompras"'
     };
   
     request(options2, (error2, results2)=> {
@@ -223,7 +240,7 @@ app.get('/dashboard', (req, res)=>{
       console.log(error);
     }
     let sales = Math.floor(JSON.parse(results.body)[0]['sum(CreditAmount)']).toLocaleString();
-    console.log('sales: ', sales);
+    console.log(sales);
     //SECOND REQUEST - PURCHASES
     let options2 = {
       method: 'get',
@@ -234,14 +251,35 @@ app.get('/dashboard', (req, res)=>{
         console.log(error2);
       }
       let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
-      console.log('purchases: ', purchases);
-      let dashboard = {
-        totalSales: sales,
-        totalPurchases: purchases
+      console.log(purchases);
+      //THIRD REQUEST - TOP 5 CUSTOMERS
+      let options = {
+        method: 'get',
+        url: 'http://localhost:5000/customersales'
       };
-      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-      res.set('Content-Type', 'application/json');
-      res.send(JSON.stringify(dashboard));
+      request(options, (error3, results3)=> {
+        if (error3) {
+          console.log(error3);
+        }
+        let topcustomerscompany = [];
+        let topcustomerstotal = [];
+        let topcustomers = JSON.parse(results3.body);
+        for (const key of Object.keys(topcustomers)) {
+          topcustomerscompany.push(topcustomers[key].CompanyName);
+          topcustomerstotal.push(topcustomers[key].GrossTotal)
+        }
+        console.log('company ', topcustomerscompany);
+        console.log('total ', topcustomerstotal);
+        let dashboard = {
+          totalSales: sales,
+          totalPurchases: purchases,
+          topCustomersCompany: topcustomerscompany,
+          topCustomersTotal: topcustomerstotal
+        };
+        res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+        res.set('Content-Type', 'application/json');
+        res.send(JSON.stringify(dashboard));
+      });
     });
   });
 

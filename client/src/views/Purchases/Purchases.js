@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container, Row, Col, Card, CardBody, CardHeader, Badge, Table } from 'reactstrap';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 
 import {
@@ -48,35 +48,6 @@ const bar = {
     ],
 };
 
-
-//intel on line chart
-
-const line = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
-        {
-            label: 'My First dataset',
-            fill: false,
-            lineTension: 0.1,
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            borderCapStyle: 'butt',
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: 'miter',
-            pointBorderColor: 'rgba(75,192,192,1)',
-            pointBackgroundColor: '#fff',
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-            pointHoverBorderColor: 'rgba(220,220,220,1)',
-            pointHoverBorderWidth: 2,
-            pointRadius: 1,
-            pointHitRadius: 10,
-            data: [65, 59, 80, 81, 56, 55, 40],
-        },
-    ],
-};
 const options = {
     tooltips: {
         enabled: false,
@@ -174,7 +145,7 @@ class Purchases extends Component {
                                 <Col xs="12" lg="12">
                                     <Card>
                                         <CardHeader>
-                                            Line Chart
+                                            Bar Chart
                                             <div className="card-header-actions">
                                             <a href="http://www.chartjs.org" className="card-header-action">
                                                 <small className="text-muted">docs</small>
@@ -183,7 +154,7 @@ class Purchases extends Component {
                                         </CardHeader>
                                         <CardBody>
                                             <div className="chart-wrapper">
-                                                <Line data={line} height={100} options={options} />
+                                                <Bar data={bar} height={100} options={options} />
                                             </div>
                                         </CardBody>
                                     </Card>
