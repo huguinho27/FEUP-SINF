@@ -158,11 +158,22 @@ app.get('/purchases', (req, res)=> {
       if (error2) {
         console.log(error2);
       }
-      console.log(results2.body);
+      //console.log(results2.body);
       res.set('Content-Type', 'application/json');
       res.status(200);
       res.send(results2.body);
     });
+  });
+});
+
+/**
+ * Get suppliers from DB
+ */
+app.get('/dashboard/suppliers', (req, res)=>{
+  connectDB();
+  connection.query('SELECT Website, CompanyName, BillingAddressDetail FROM suppliers', (error, results, fields)=> {
+    if (error) throw error;
+    res.send(results);
   });
 });
 
@@ -274,17 +285,44 @@ app.get('/dashboard', (req, res)=>{
           topcustomerscompany.push(topcustomers[key].CompanyName);
           topcustomerstotal.push(topcustomers[key].GrossTotal)
         }
-        console.log('company ', topcustomerscompany);
-        console.log('total ', topcustomerstotal);
-        let dashboard = {
-          totalSales: sales,
-          totalPurchases: purchases,
-          topCustomersCompany: topcustomerscompany,
-          topCustomersTotal: topcustomerstotal
+        /*console.log('company ', topcustomerscompany);
+        console.log('total ', topcustomerstotal);*/
+        //FOURTH REQUEST - SUPPLIERS
+        let options = {
+          method: 'get',
+          url: 'http://localhost:5000/dashboard/suppliers'
         };
-        res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-        res.set('Content-Type', 'application/json');
-        res.send(JSON.stringify(dashboard));
+        request(options, (error4, results4)=> {
+          if (error4) {
+            console.log(error4);
+          }
+          let suppliersname = [];
+          let supplierswebsite = [];
+          let suppliersaddress = [];
+          let suppliers = JSON.parse(results4.body);
+          for (const key of Object.keys(suppliers)) {
+            if (suppliers[key].Website === null) {
+            supplierswebsite.push('--');
+            } else {
+              supplierswebsite.push(suppliers[key].Website);
+            }
+            suppliersaddress.push(suppliers[key].BillingAddressDetail);
+            suppliersname.push(suppliers[key].CompanyName);
+          }
+
+          let dashboard = {
+            totalSales: sales,
+            totalPurchases: purchases,
+            topCustomersCompany: topcustomerscompany,
+            topCustomersTotal: topcustomerstotal,
+            suppliersName: suppliersname,
+            suppliersWebsite: supplierswebsite,
+            suppliersAddress: suppliersaddress
+          };
+          res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+          res.set('Content-Type', 'application/json');
+          res.send(JSON.stringify(dashboard));
+        });
       });
     });
   });
