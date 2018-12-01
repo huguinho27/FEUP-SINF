@@ -123,7 +123,7 @@ class Purchases extends Component {
         .catch(function(err){
             console.log(err);
         })
-        .then((json) => /*this.populatePurchases(json)*/ console.log(json))
+        .then((json) => this.populatePurchases(json))
     }
 
     populatePurchases(json){
