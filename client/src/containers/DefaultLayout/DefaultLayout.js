@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody, CardHeader, Table } from 'reactstrap';
+import { Container, Row, Col, Card, CardBody, CardHeader, Table, Button, ButtonGroup, ButtonToolbar } from 'reactstrap';
 import { Pie } from 'react-chartjs-2';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
@@ -101,6 +101,14 @@ const months = [
 
 ]
 const defaultMonth = months[4]
+
+const exportButtonTopPadding = {
+    paddingTop: '2px',
+}
+
+function exportButton() {
+    console.log('Exporting... fufufufufu');
+}
 
 
 class DefaultLayout extends Component {
@@ -219,6 +227,17 @@ class DefaultLayout extends Component {
                                     <Col xs="6" sm="5" lg="2" >
                                         <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
                                     </Col>
+
+                                    <Col xs="6" sm="5" lg="2">
+                                        <div  style={exportButtonTopPadding}>
+                                            <ButtonGroup>
+                                                <ButtonToolbar>
+                                                    <Button color="success" onClick={exportButton}>Export</Button>
+                                                </ButtonToolbar>
+                                            </ButtonGroup>
+                                        </div>
+                                    </Col>
+
                                 </Row>
                             </div>
                             
