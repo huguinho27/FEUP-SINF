@@ -106,13 +106,6 @@ const exportButtonTopPadding = {
     paddingTop: '2px',
 }
 
-function exportButton() {
-    console.log('Exporting... fufufufufu');
-    // export data here
-    window.location.reload(); //reload page
-}
-
-
 class DefaultLayout extends Component {
     constructor (props) {
       super(props);
@@ -234,7 +227,7 @@ class DefaultLayout extends Component {
                                         <div  style={exportButtonTopPadding}>
                                             <ButtonGroup>
                                                 <ButtonToolbar>
-                                                    <Button color="success" onClick={exportButton}>Export</Button>
+                                                    <Button color="success" onClick={this.fetchData}>Export</Button>
                                                 </ButtonToolbar>
                                             </ButtonGroup>
                                         </div>
