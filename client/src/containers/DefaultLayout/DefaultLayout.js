@@ -108,6 +108,8 @@ const exportButtonTopPadding = {
 
 function exportButton() {
     console.log('Exporting... fufufufufu');
+    // export data here
+    window.location.reload(); //reload page
 }
 
 
