@@ -26,9 +26,7 @@ class DefaultHeader extends Component {
                     full={{ src: logo, width: 89, height: 25, alt: 'Feup Logo' }}
                     minimized={{ src: small, width: 30, height: 30, alt: 'Feup Logo'}}        
                 />
-                <AppSidebarToggler className="d-md-down-none" display="lg" />
-               
-                <AppAsideToggler className="d-md-down-none" />
+ 
             </React.Fragment>
         );
     }
