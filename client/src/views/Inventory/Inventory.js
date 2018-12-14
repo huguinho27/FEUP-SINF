@@ -35,6 +35,40 @@ const paddingCard = {
 }
 
 class Inventory extends Component {
+    constructor (props) {
+      super(props);
+      this.state = {
+          productsBelowSecurityStock: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          productsInventory: [{},{}],
+          inventoryValue: 0,
+      }
+    }
+
+    componentWillMount() {
+      this.fetchData();
+    }
+
+    fetchData() {
+      fetch('http://localhost:5000/inventory',)
+      .then(function(response) {
+        if (response.status >= 400) {
+            throw new Error("Bad response from server");
+        }
+        return response.json();
+      })
+      .catch(function(err){
+          console.log(err);
+      })
+      .then((json) => {
+        this.setState({
+          inventoryValue: json.inventoryValue,
+          productsBelowSecurityStock: json.productsBelowSecurityStock,
+          productsInventory: json.productsInventory
+        });
+        
+      })
+    }
+
     render() {
         return (
             <div className="app">
@@ -63,8 +97,7 @@ class Inventory extends Component {
                                         <div className="text-value">Inventory Value</div>
                                     </CardHeader>
                                     <CardBody className="pb-0 bg-info">
-                                        <div style={paddingCard} className="text-value">125.000 €</div>
-                                        {/* <div>Inventory Value</div> */}
+                                        <div style={paddingCard} className="text-value">{this.state.inventoryValue} €</div>
                                     </CardBody>
                                 </Card>
                                 <Card>
@@ -82,30 +115,16 @@ class Inventory extends Component {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>Powerbank Miaomi Mi 2C</td>
-                                        <td>24 €</td>
-                                        <td>220</td>
-                                        <td>5,280 €</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Memória RAM G.Skill V 16GB </td>
-                                        <td>156 €</td>
-                                        <td>140</td>
-                                        <td>21,000 €</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Router Asus RT-AX88U</td>
-                                        <td>428 €</td>
-                                        <td>70</td>
-                                        <td>29,960 €</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Portátil PNY Prevail Pro</td>
-                                        <td>799 €</td> 
-                                        <td>22</td>
-                                        <td>17,578 €</td>
-                                    </tr>
+                                    {this.state.productsInventory.map(function(item, key) {
+                                      return (
+                                        <tr key = {key}>
+                                          <td>{item.name}</td>
+                                          <td>{item.valuePerUnit}</td>
+                                          <td>{item.quantity}</td>
+                                          <td>{Math.floor(item.prodTotalValue).toLocaleString()}</td>
+                                        </tr>
+                                      )
+                                    })}
                                     </tbody>
                                     </Table>
                                     <Pagination>
@@ -125,25 +144,17 @@ class Inventory extends Component {
                             <Col xs="12" lg="6">
                             <Card>
                                 <CardHeader>
-                                    <i className="fa fa-align-justify"></i> Below Security Stock
+                                    <i className="fa fa-align-justify"></i> Products Below Security Stock
                                 </CardHeader>
                                 <CardBody>
                                     <Table responsive striped>
-                                    <tr>
-                                        <td>1- PC ASRock DeskMini</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2- Powerbank Miaomi Mi 2C</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3- Memória RAM G.Skill V 16GB</td>
-                                    </tr>
-                                    <tr>
-                                        <td>4- Powerbank Miaomi Mi 2C</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5- Memória RAM G.Skill V 16GB</td>
-                                    </tr>
+                                    {this.state.productsBelowSecurityStock.map(function(item, key) {
+                                      return (
+                                        <tr >
+                                          <td>{item.name}</td>
+                                        </tr>
+                                      )
+                                    })}
                                     </Table>
                                     <Pagination>
                                     <PaginationItem disabled><PaginationLink previous tag="button">Prev</PaginationLink></PaginationItem>

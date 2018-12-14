@@ -97,7 +97,92 @@ app.get('/sales', (req, res)=>{
   });
 });
 
+/**
+ * Get inventory data from Primavera
+ */
+app.get('/inventory', (req, res)=>{
+  let headers = {
+    'Content-type': 'application/x-www-form-urlencoded'
+  };
 
+  let options = {
+    method: 'post',
+    form: {
+      username: 'feup',
+      password: 'qualquer1',
+      company: 'DEMO',
+      instance: 'Default',
+      grant_type: 'password',
+      line: 'professional'
+    },
+    url: 'http://' + hostname + ':2018/WebApi/token',
+    headers
+  };
+
+  //Request to get authentication token
+  request(options, (error1, results1)=> {
+    if (error1) throw error1;
+    let parsedAuthentication = JSON.parse(results1.body);
+    let bearerToken = parsedAuthentication.access_token;
+    let bearer = parsedAuthentication.token_type;
+    
+    //Request to get purchases, providing the token
+    let headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer' + ' ' + bearerToken
+    };
+  
+    let options2 = {
+      headers,
+      method: 'get',
+      url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
+      body: '"Select Artigo.STKActual as Quantity, ArtigoMoeda.PVP1 as ValuePerUnit, Artigo.Descricao as Name, STKActual*PVP1 as TotalValue, Artigo.Artigo, Artigo.STKMinimo, Artigo.STKActual FROM ArtigoMoeda, Artigo WHERE ArtigoMoeda.Artigo = Artigo.Artigo"'
+    };
+  
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        res.status(500);
+        res.set('Content-Type', 'application/json');
+        res.send({error: 'Server error'});
+        console.log(error2);
+      }
+      let obj2 = JSON.parse(results2.body).DataSet.Table;
+      let invValue = 0;
+      let belowMinStock = [];
+      let inventoryProducts = [];
+
+      for (let i = 0; i < obj2.length; i++) {
+        // Get Total Inventory Value
+        invValue += obj2[i].TotalValue;
+
+        // Products below security stock get pushed in the list
+        if (obj2[i].STKActual < obj2[i].STKMinimo) {
+          belowMinStock.push({name: obj2[i].Name});
+        }
+
+        //Push inventory products to array
+        inventoryProducts.push({
+          name: obj2[i].Name,
+          valuePerUnit: obj2[i].ValuePerUnit,
+          quantity: obj2[i].Quantity,
+          prodTotalValue: obj2[i].TotalValue
+        });
+      }
+      console.log(belowMinStock.length);
+
+      let inventory = {
+        inventoryValue: Math.floor(invValue).toLocaleString(),
+        productsBelowSecurityStock: belowMinStock,
+        productsInventory: inventoryProducts
+      };
+      res.status(200);
+      res.set('Content-Type', 'application/json');
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.send(JSON.stringify(inventory));
+    });
+  });
+});
 
 /**
  * Get suppliers from DB
@@ -290,8 +375,6 @@ app.get('/purchases', (req, res)=> {
 });
 
 app.get('/dashboard', (req, res)=>{
-  //connectDB();
-
   //FIRST REQUEST - SALES
   let options = {
     method: 'get',
@@ -302,7 +385,7 @@ app.get('/dashboard', (req, res)=>{
       console.log(error);
     }
     let sales = Math.floor(JSON.parse(results.body)[0]['sum(CreditAmount)']).toLocaleString();
-    console.log(sales);
+    
     //SECOND REQUEST - PURCHASES
     let options2 = {
       method: 'get',
@@ -313,7 +396,7 @@ app.get('/dashboard', (req, res)=>{
         console.log(error2);
       }
       let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
-      console.log(purchases);
+      console.log('Primavera connected');
       //THIRD REQUEST - TOP 5 CUSTOMERS
       let options = {
         method: 'get',
@@ -330,8 +413,7 @@ app.get('/dashboard', (req, res)=>{
           topcustomerscompany.push(topcustomers[key].CompanyName);
           topcustomerstotal.push(topcustomers[key].GrossTotal)
         }
-        /*console.log('company ', topcustomerscompany);
-        console.log('total ', topcustomerstotal);*/
+        
         //FOURTH REQUEST - SUPPLIERS
         let options = {
           method: 'get',
@@ -354,20 +436,36 @@ app.get('/dashboard', (req, res)=>{
             suppliersaddress.push(suppliers[key].BillingAddressDetail);
             suppliersname.push(suppliers[key].CompanyName);
           }
-
-          let dashboard = {
-            totalSales: sales,
-            totalPurchases: purchases,
-            topCustomersCompany: topcustomerscompany,
-            topCustomersTotal: topcustomerstotal,
-            suppliersName: suppliersname,
-            suppliersWebsite: supplierswebsite,
-            suppliersAddress: suppliersaddress
+          
+          // Request to get inventory value
+          let options3 = {
+            method: 'get',
+            url: 'http://localhost:5000/inventory'
           };
-          res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-          res.set('Content-Type', 'application/json');
-          //connection.end();
-          res.send(JSON.stringify(dashboard));
+
+          request(options3, (error3, results3)=> {
+            if (error3) {
+              res.status(500);
+              res.set('Content-Type', 'application/json');
+              res.send({error: 'Server error'});
+              console.log(error3);
+            }
+            let obj2 = JSON.parse(results3.body);
+
+            let dashboard = {
+              totalSales: sales,
+              totalPurchases: purchases,
+              topCustomersCompany: topcustomerscompany,
+              topCustomersTotal: topcustomerstotal,
+              suppliersName: suppliersname,
+              suppliersWebsite: supplierswebsite,
+              suppliersAddress: suppliersaddress,
+              inventoryValue: obj2.inventoryValue
+            };
+            res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+            res.set('Content-Type', 'application/json');
+            res.send(JSON.stringify(dashboard));
+          });
         });
       });
     });

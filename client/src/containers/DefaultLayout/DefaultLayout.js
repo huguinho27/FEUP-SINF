@@ -117,7 +117,8 @@ class DefaultLayout extends Component {
         topCustomersTotal: [0,0,0,0,0],
         topSuppliersName: [],
         topSuppliersWebsite: [],
-        topSuppliersAddress: []
+        topSuppliersAddress: [],
+        inventoryValue: 0
       };
     }
     fetchData(event) {
@@ -139,7 +140,8 @@ class DefaultLayout extends Component {
         topCustomersTotal: json.topCustomersTotal,
         topSuppliersName: json.suppliersName,
         topSuppliersWebsite: json.suppliersWebsite,
-        topSuppliersAddress: json.suppliersAddress
+        topSuppliersAddress: json.suppliersAddress,
+        inventoryValue: json.inventoryValue
       })
     })
     }
@@ -268,7 +270,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Inventory Value</div>
-                                        <div style={paddingCard}>264.000 €</div>
+                                        <div style={paddingCard}>{this.state.inventoryValue} €</div>
                                     </CardBody>        
                                 </Card>
                             </Col>
