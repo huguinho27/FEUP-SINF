@@ -109,7 +109,8 @@ class Sales extends Component {
     populateSalesYTD(json) {
         let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
-            let month = parseInt(json[i].InvoiceDate.split("-")[1]);
+            let month = parseInt(json[i].MovementStartTime.split("-")[1]);
+            console.log(month);
 
             data[month-1] += json[i].CreditAmount;
         }
