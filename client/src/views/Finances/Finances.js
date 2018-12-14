@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container, Row, Col, CardColumns, Card, CardBody, CardHeader } from 'reactstrap';
+import { Row, Col, Card, CardBody, CardHeader } from 'reactstrap';
 import { Line } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import Dropdown from 'react-dropdown';
@@ -89,7 +88,10 @@ const months = [
 ]
 const defaultMonth = months[4]
 
+
 class Finances extends Component {
+    
+
     render() {
         return (
             <div className="app">
@@ -130,6 +132,7 @@ class Finances extends Component {
                                     <Col xs="6" sm="5" lg="2" >
                                         <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
                                     </Col>
+
                                 </Row>
                             </div>
 

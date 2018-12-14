@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody, CardHeader, Table, Badge } from 'reactstrap';
+import { Row, Col, Card, CardBody, CardHeader, Table } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import 'whatwg-fetch';
-import 'isomorphic-fetch';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import 'whatwg-fetch';
+import 'isomorphic-fetch';
 
 import {
     AppBreadcrumb,

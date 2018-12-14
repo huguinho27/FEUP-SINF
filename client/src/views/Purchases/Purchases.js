@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody, CardHeader, Badge, Table } from 'reactstrap';
+import { Row, Col, Card, CardBody, CardHeader, Table, Button, ButtonGroup, ButtonToolbar } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import 'whatwg-fetch';
+import 'isomorphic-fetch';
+
 
 import {
     AppBreadcrumb,
@@ -88,6 +90,10 @@ const options = {
     maintainAspectRatio: false
 }
 
+const exportButtonTopPadding = {
+    paddingTop: '2px',
+}
+
 class Purchases extends Component {
     constructor (props) {
       super(props);
@@ -125,6 +131,17 @@ class Purchases extends Component {
     }
 
     populatePurchases(json) {
+        this.state = {
+            totalSales: 0,
+            totalPurchases: 0,
+            topCustomersCompany : [0,0,0,0,0],
+            topCustomersTotal: [0,0,0,0,0],
+            topSuppliersName: [],
+            topSuppliersWebsite: [],
+            topSuppliersAddress: [],
+            inventoryValue: 0
+          };
+
       console.log('hello');
       let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
@@ -139,6 +156,47 @@ class Purchases extends Component {
         this.setState({purchasesYTD: data});
         console.log(this.state.purchasesYTD);
     }
+
+    fetchData(event) {
+        fetch('http://localhost:5000/purchases', {mode: 'cors'})
+        .then(function(response) {
+          if (response.status >= 400) {
+             throw new Error("Bad response from server");
+          }
+          return response.json();
+        })
+        .catch(function(err){
+          console.log('Error: ', err);
+        })
+        .then((json) => {
+          this.setState({
+          totalSales: json.totalSales,
+          totalPurchases: json.totalPurchases,
+          topCustomersCompany: json.topCustomersCompany,
+          topCustomersTotal: json.topCustomersTotal,
+          topSuppliersName: json.suppliersName,
+          topSuppliersWebsite: json.suppliersWebsite,
+          topSuppliersAddress: json.suppliersAddress,
+          inventoryValue: json.inventoryValue
+        })
+      })
+      }
+      componentWillMount() {
+        this.fetchData();
+      }
+      createVectors() {
+        let rows = [];
+        for (let i = 0; i < this.state.topSuppliersAddress.length; i++) {
+          rows.push(<tr>
+            <td>{this.state.topSuppliersName[i]}</td>
+            <td>{this.state.topSuppliersAddress[i]}</td>
+            <td>{this.state.topSuppliersWebsite[i]}</td>
+          </tr>);
+        }
+        return rows;
+      }
+
+    
 
     render() {
         var bar = {
@@ -207,6 +265,17 @@ class Purchases extends Component {
                                     <Col xs="6" sm="5" lg="2" >
                                         <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
                                     </Col>
+
+                                     <Col xs="6" sm="5" lg="2">
+                                        <div  style={exportButtonTopPadding}>
+                                            <ButtonGroup>
+                                                <ButtonToolbar>
+                                                    <Button color="success" onClick={this.fetchData}>Export</Button>
+                                                </ButtonToolbar>
+                                            </ButtonGroup>
+                                        </div>
+                                    </Col>
+
                                 </Row>
                             </div>
                             
