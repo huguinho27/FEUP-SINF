@@ -6,8 +6,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 //const hostname = '10.227.151.135';
-//const hostname = '10.227.150.73';
-const hostname = '192.168.1.134';
+const hostname = '10.227.157.54';
+//const hostname = '169.254.73.28';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -85,7 +85,7 @@ app.get('/products', (req, res)=>{
  */
 app.get('/sales', (req, res)=>{
   //connectDB();
-  connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.InvoiceDate, products.ProductType, products.ProductCode, products.ProductGroup, ' +
+  connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.MovementStartTime, products.ProductType, products.ProductCode, products.ProductGroup, ' +
   'products.ProductDescription, salesLines.UnitPrice, salesLines.CreditAmount FROM salesLines INNER JOIN salesInvoices ' +
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
   'products.ProductCode = salesLines.ProductCode', (error, results, fields)=>{
