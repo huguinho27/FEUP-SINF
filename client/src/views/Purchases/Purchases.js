@@ -47,14 +47,14 @@ const rowPadding = {
 }
 
 const years = [
-    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
+    2019
 ]
-const defaultYear = years[9]
+const defaultYear = years[0]
 const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
 
 ]
-const defaultMonth = months[4]
+const defaultMonth = months[1]
 
 const line = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],

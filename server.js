@@ -1,12 +1,14 @@
 const express = require('express');
 let mysql = require('mysql');
 let request = require('request');
+let bodyParser = require('body-parser');
  
 const app = express();
 const port = process.env.PORT || 5000;
+app.use(bodyParser.json());
 
 //const hostname = '10.227.151.135';
-const hostname = '192.168.0.194';
+const hostname = '192.168.1.94';
 //const hostname = '169.254.73.28';
 
 var connection = mysql.createConnection({
@@ -17,6 +19,104 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
+app.get('/dashboard/:start/:end', (req, res)=>{
+  //console.log('http://localhost:5000/dashboard/salestotal/'+req.params.start+'/'+req.params.end);
+  //FIRST REQUEST - SALES
+  let options = {
+    method: 'get',
+    url: 'http://localhost:5000/dashboard/salestotal/'+req.params.start+'/'+req.params.end
+  };
+  request(options, (error, results)=> {
+    if (error) {
+      console.log(error);
+    }
+    let sales = Math.floor(JSON.parse(results.body)[0]['sum(CreditAmount)']).toLocaleString();
+    
+    //SECOND REQUEST - PURCHASES
+    let options2 = {
+      method: 'get',
+      url: 'http://localhost:5000/dashboard/purchasestotal'
+    };
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        console.log(error2);
+      }
+      let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
+      console.log('Primavera connected');
+      //THIRD REQUEST - TOP 5 CUSTOMERS
+      let options = {
+        method: 'get',
+        url: 'http://localhost:5000/customersales'
+      };
+      request(options, (error3, results3)=> {
+        if (error3) {
+          console.log(error3);
+        }
+        let topcustomerscompany = [];
+        let topcustomerstotal = [];
+        let topcustomers = JSON.parse(results3.body);
+        for (const key of Object.keys(topcustomers)) {
+          topcustomerscompany.push(topcustomers[key].CompanyName);
+          topcustomerstotal.push(topcustomers[key].GrossTotal)
+        }
+        
+        //FOURTH REQUEST - SUPPLIERS
+        let options = {
+          method: 'get',
+          url: 'http://localhost:5000/dashboard/suppliers'
+        };
+        request(options, (error4, results4)=> {
+          if (error4) {
+            console.log(error4);
+          }
+          let suppliersname = [];
+          let supplierswebsite = [];
+          let suppliersaddress = [];
+          let suppliers = JSON.parse(results4.body);
+          for (const key of Object.keys(suppliers)) {
+            if (suppliers[key].Website === null) {
+            supplierswebsite.push('--');
+            } else {
+              supplierswebsite.push(suppliers[key].Website);
+            }
+            suppliersaddress.push(suppliers[key].BillingAddressDetail);
+            suppliersname.push(suppliers[key].CompanyName);
+          }
+          
+          // Request to get inventory value
+          let options3 = {
+            method: 'get',
+            url: 'http://localhost:5000/inventory'
+          };
+
+          request(options3, (error3, results3)=> {
+            if (error3) {
+              res.status(500);
+              res.set('Content-Type', 'application/json');
+              res.send({error: 'Server error'});
+              console.log(error3);
+            }
+            let obj2 = JSON.parse(results3.body);
+
+            let dashboard = {
+              totalSales: sales,
+              totalPurchases: purchases,
+              topCustomersCompany: topcustomerscompany,
+              topCustomersTotal: topcustomerstotal,
+              suppliersName: suppliersname,
+              suppliersWebsite: supplierswebsite,
+              suppliersAddress: suppliersaddress,
+              inventoryValue: obj2.inventoryValue
+            };
+            res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+            res.set('Content-Type', 'application/json');
+            res.send(JSON.stringify(dashboard));
+          });
+        });
+      });
+    });
+  });
+});
 
 /**
  * Get customers from DB
@@ -277,19 +377,17 @@ app.get('/dashboard/suppliers', (req, res)=>{
   });
 });
 
-app.get('/dashboard/sales/total', (req,res)=>{
-  //connectDB();
-  connection.query('SELECT sum(CreditAmount) FROM saleslines', (error, results, fields)=>{
+app.get('/dashboard/salestotal/:start/:end', (req,res)=>{
+  connection.query('SELECT sum(CreditAmount) FROM saleslines where TaxPointDate > ' + '\'' + req.params.start + '\'' + ' AND TaxPointDate < ' + '\'' + req.params.end + '\'', (error, results, fields)=>{
     if (error) throw error;
     res.set('Content-Type', 'application/json');
     res.status(200);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    //connection.end();
     res.send(results);
   });
 });
 
-app.get('/dashboard/purchases/total', (req,res)=>{
+app.get('/dashboard/purchasestotal', (req,res)=>{
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
   };
@@ -348,7 +446,7 @@ app.get('/purchases', (req, res)=> {
 
   let options = {
     method: 'get',
-    url: 'http://localhost:5000/dashboard/purchases/total'
+    url: 'http://localhost:5000/dashboardpurchases/total'
   };
   request(options, (error, results)=> {
     if (error) {
@@ -382,104 +480,6 @@ app.get('/purchases', (req, res)=> {
         res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.set('Content-Type', 'application/json');
         res.send(JSON.stringify(purchases));
-      });
-    });
-  });
-});
-
-app.get('/dashboard', (req, res)=>{
-  //FIRST REQUEST - SALES
-  let options = {
-    method: 'get',
-    url: 'http://localhost:5000/dashboard/sales/total'
-  };
-  request(options, (error, results)=> {
-    if (error) {
-      console.log(error);
-    }
-    let sales = Math.floor(JSON.parse(results.body)[0]['sum(CreditAmount)']).toLocaleString();
-    
-    //SECOND REQUEST - PURCHASES
-    let options2 = {
-      method: 'get',
-      url: 'http://localhost:5000/dashboard/purchases/total'
-    };
-    request(options2, (error2, results2)=> {
-      if (error2) {
-        console.log(error2);
-      }
-      let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
-      console.log('Primavera connected');
-      //THIRD REQUEST - TOP 5 CUSTOMERS
-      let options = {
-        method: 'get',
-        url: 'http://localhost:5000/customersales'
-      };
-      request(options, (error3, results3)=> {
-        if (error3) {
-          console.log(error3);
-        }
-        let topcustomerscompany = [];
-        let topcustomerstotal = [];
-        let topcustomers = JSON.parse(results3.body);
-        for (const key of Object.keys(topcustomers)) {
-          topcustomerscompany.push(topcustomers[key].CompanyName);
-          topcustomerstotal.push(topcustomers[key].GrossTotal)
-        }
-        
-        //FOURTH REQUEST - SUPPLIERS
-        let options = {
-          method: 'get',
-          url: 'http://localhost:5000/dashboard/suppliers'
-        };
-        request(options, (error4, results4)=> {
-          if (error4) {
-            console.log(error4);
-          }
-          let suppliersname = [];
-          let supplierswebsite = [];
-          let suppliersaddress = [];
-          let suppliers = JSON.parse(results4.body);
-          for (const key of Object.keys(suppliers)) {
-            if (suppliers[key].Website === null) {
-            supplierswebsite.push('--');
-            } else {
-              supplierswebsite.push(suppliers[key].Website);
-            }
-            suppliersaddress.push(suppliers[key].BillingAddressDetail);
-            suppliersname.push(suppliers[key].CompanyName);
-          }
-          
-          // Request to get inventory value
-          let options3 = {
-            method: 'get',
-            url: 'http://localhost:5000/inventory'
-          };
-
-          request(options3, (error3, results3)=> {
-            if (error3) {
-              res.status(500);
-              res.set('Content-Type', 'application/json');
-              res.send({error: 'Server error'});
-              console.log(error3);
-            }
-            let obj2 = JSON.parse(results3.body);
-
-            let dashboard = {
-              totalSales: sales,
-              totalPurchases: purchases,
-              topCustomersCompany: topcustomerscompany,
-              topCustomersTotal: topcustomerstotal,
-              suppliersName: suppliersname,
-              suppliersWebsite: supplierswebsite,
-              suppliersAddress: suppliersaddress,
-              inventoryValue: obj2.inventoryValue
-            };
-            res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-            res.set('Content-Type', 'application/json');
-            res.send(JSON.stringify(dashboard));
-          });
-        });
       });
     });
   });

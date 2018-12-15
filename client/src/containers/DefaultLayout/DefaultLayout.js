@@ -93,14 +93,17 @@ const pie2 = {
 };
 
 const years = [
-    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
+    '2019'
 ]
-const defaultYear = years[8]
+const defaultYear = years[0]
 const months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-
+    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
 ]
-const defaultMonth = months[4]
+const months2 = [
+  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+]
+const defaultMonth = months[0]
+const defaultMonth2 = months2[11]
 
 const exportButtonTopPadding = {
     paddingTop: '2px',
@@ -120,9 +123,32 @@ class DefaultLayout extends Component {
         topSuppliersAddress: [],
         inventoryValue: 0
       };
+      this.fetchData = this.fetchData.bind(this);
+    }
+    componentWillMount() {
+      this.fetchData();
     }
     fetchData(event) {
-      fetch('http://localhost:5000/dashboard', {mode: 'cors'})
+      console.log('fetch called!');
+      let startmonth, endmonth;
+      let startmonth1 = months.indexOf(defaultMonth)+1;
+      let endmonth1 = months2.indexOf(defaultMonth2)+1;
+      if (startmonth1 < 10) {
+        startmonth = '0' + startmonth1;
+      }
+      else {
+        startmonth = startmonth1;
+      }
+
+      if (endmonth1 < 10) {
+        endmonth = '0' + endmonth1;
+      }
+      else {
+        endmonth = endmonth1;
+      }
+      let url = 'http://localhost:5000/dashboard/'+defaultYear + '-' + startmonth + '-01/'+defaultYear + '-' + endmonth + '-31';
+      console.log(url);
+      fetch(url, {mode: 'cors'})
       .then(function(response) {
         if (response.status >= 400) {
            throw new Error("Bad response from server");
@@ -133,6 +159,7 @@ class DefaultLayout extends Component {
         console.log('Error: ', err);
       })
       .then((json) => {
+        console.log(json);
         this.setState({
         totalSales: json.totalSales,
         totalPurchases: json.totalPurchases,
@@ -145,9 +172,7 @@ class DefaultLayout extends Component {
       })
     })
     }
-    componentWillMount() {
-      this.fetchData();
-    }
+    
     createVectors() {
       let rows = [];
       for (let i = 0; i < this.state.topSuppliersAddress.length; i++) {
@@ -222,11 +247,11 @@ class DefaultLayout extends Component {
                                         <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
                                     </Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth2} placeholder="Select an option" />
                                     </Col>
 
                                     <Col xs="6" sm="5" lg="2">
-                                        <div  style={exportButtonTopPadding}>
+                                        <div style={exportButtonTopPadding}>
                                             <ButtonGroup>
                                                 <ButtonToolbar>
                                                     <Button color="success" onClick={this.fetchData}>Export</Button>
