@@ -49,7 +49,7 @@ const rowPadding = {
 const years = [
     '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
 ]
-const defaultYear = years[8]
+const defaultYear = years[9]
 const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
 
@@ -106,7 +106,7 @@ class Purchases extends Component {
     }
 
     componentWillMount() {
-        this.fetchData();
+      this.fetchData();
     }
 
     fetchData() {
@@ -142,7 +142,6 @@ class Purchases extends Component {
             inventoryValue: 0
           };
 
-      console.log('hello');
       let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
             let month = parseInt(json[i].DataDoc.split("-")[1]);
@@ -157,46 +156,17 @@ class Purchases extends Component {
         console.log(this.state.purchasesYTD);
     }
 
-    fetchData(event) {
-        fetch('http://localhost:5000/purchases', {mode: 'cors'})
-        .then(function(response) {
-          if (response.status >= 400) {
-             throw new Error("Bad response from server");
-          }
-          return response.json();
-        })
-        .catch(function(err){
-          console.log('Error: ', err);
-        })
-        .then((json) => {
-          this.setState({
-          totalSales: json.totalSales,
-          totalPurchases: json.totalPurchases,
-          topCustomersCompany: json.topCustomersCompany,
-          topCustomersTotal: json.topCustomersTotal,
-          topSuppliersName: json.suppliersName,
-          topSuppliersWebsite: json.suppliersWebsite,
-          topSuppliersAddress: json.suppliersAddress,
-          inventoryValue: json.inventoryValue
-        })
-      })
+    createVectors() {
+      let rows = [];
+      for (let i = 0; i < this.state.topSuppliersAddress.length; i++) {
+        rows.push(<tr>
+          <td>{this.state.topSuppliersName[i]}</td>
+          <td>{this.state.topSuppliersAddress[i]}</td>
+          <td>{this.state.topSuppliersWebsite[i]}</td>
+        </tr>);
       }
-      componentWillMount() {
-        this.fetchData();
-      }
-      createVectors() {
-        let rows = [];
-        for (let i = 0; i < this.state.topSuppliersAddress.length; i++) {
-          rows.push(<tr>
-            <td>{this.state.topSuppliersName[i]}</td>
-            <td>{this.state.topSuppliersAddress[i]}</td>
-            <td>{this.state.topSuppliersWebsite[i]}</td>
-          </tr>);
-        }
-        return rows;
-      }
-
-    
+      return rows;
+    }
 
     render() {
         var bar = {

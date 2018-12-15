@@ -61,7 +61,7 @@ const options = {
 const years = [
     '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
 ]
-const defaultYear = years[8]
+const defaultYear = years[9]
 const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
 
@@ -108,7 +108,7 @@ class Sales extends Component {
     populateSalesYTD(json) {
         let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
-            let month = parseInt(json[i].MovementStartTime.split("-")[1]);
+            let month = parseInt(json[i].InvoiceDate.split("-")[1]);
             console.log(month);
 
             data[month-1] += json[i].CreditAmount;

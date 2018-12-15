@@ -6,7 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 //const hostname = '10.227.151.135';
-const hostname = '10.227.157.54';
+const hostname = '192.168.0.194';
 //const hostname = '169.254.73.28';
 
 var connection = mysql.createConnection({
@@ -56,13 +56,11 @@ app.get('/customersales', (req, res)=>{
  * Get invoices from DB
  */
 app.get('/invoices', (req, res)=>{
-  //connectDB();
   connection.query('SELECT salesinvoices.InvoiceNo, salesinvoices.InvoiceDate, salesinvoices.GrossTotal, ' +
   'customers.CompanyName FROM salesinvoices, customers' + 
   'WHERE salesinvoices.CustomerID = customers.CustomerID', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
-    //connection.end();
     res.send(results);
   });
 });
@@ -71,11 +69,9 @@ app.get('/invoices', (req, res)=>{
  * Get products from DB
  */
 app.get('/products', (req, res)=>{
-  //connectDB();
   connection.query('SELECT * FROM products', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
-    //connection.end();
     res.send(results);
   });
 });
@@ -84,15 +80,13 @@ app.get('/products', (req, res)=>{
  * Get sales from DB
  */
 app.get('/sales', (req, res)=>{
-  //connectDB();
-  connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.MovementStartTime, products.ProductType, products.ProductCode, products.ProductGroup, ' +
+  connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.InvoiceDate, products.ProductType, products.ProductCode, products.ProductGroup, ' +
   'products.ProductDescription, salesLines.UnitPrice, salesLines.CreditAmount FROM salesLines INNER JOIN salesInvoices ' +
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
   'products.ProductCode = salesLines.ProductCode', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    //connection.end();
     res.send(results);
   });
 });
@@ -110,7 +104,7 @@ app.get('/inventory', (req, res)=>{
     form: {
       username: 'feup',
       password: 'qualquer1',
-      company: 'DEMO',
+      company: 'belaflor',
       instance: 'Default',
       grant_type: 'password',
       line: 'professional'
@@ -137,7 +131,7 @@ app.get('/inventory', (req, res)=>{
       headers,
       method: 'get',
       url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
-      body: '"Select Artigo.STKActual as Quantity, ArtigoMoeda.PVP1 as ValuePerUnit, Artigo.Descricao as Name, STKActual*PVP1 as TotalValue, Artigo.Artigo, Artigo.STKMinimo, Artigo.STKActual FROM ArtigoMoeda, Artigo WHERE ArtigoMoeda.Artigo = Artigo.Artigo"'
+      body: '"Select SUM(StkActual), PCMedio, Artigo FROM V_INV_ArtigoArmazem GROUP BY PCMedio, Artigo"'
     };
   
     request(options2, (error2, results2)=> {
@@ -147,39 +141,58 @@ app.get('/inventory', (req, res)=>{
         res.send({error: 'Server error'});
         console.log(error2);
       }
-      let obj2 = JSON.parse(results2.body).DataSet.Table;
-      let invValue = 0;
-      let belowMinStock = [];
-      let inventoryProducts = [];
 
-      for (let i = 0; i < obj2.length; i++) {
-        // Get Total Inventory Value
-        invValue += obj2[i].TotalValue;
-
-        // Products below security stock get pushed in the list
-        if (obj2[i].STKActual < obj2[i].STKMinimo) {
-          belowMinStock.push({name: obj2[i].Name});
-        }
-
-        //Push inventory products to array
-        inventoryProducts.push({
-          name: obj2[i].Name,
-          valuePerUnit: obj2[i].ValuePerUnit,
-          quantity: obj2[i].Quantity,
-          prodTotalValue: obj2[i].TotalValue
-        });
-      }
-      console.log(belowMinStock.length);
-
-      let inventory = {
-        inventoryValue: Math.floor(invValue).toLocaleString(),
-        productsBelowSecurityStock: belowMinStock,
-        productsInventory: inventoryProducts
+      let options3 = {
+        headers,
+        method: 'get',
+        url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
+        body: '"Select Artigo.Descricao as Name, Artigo.Artigo, Artigo.STKMinimo FROM ArtigoMoeda, Artigo WHERE ArtigoMoeda.Artigo = Artigo.Artigo"'
       };
-      res.status(200);
-      res.set('Content-Type', 'application/json');
-      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-      res.send(JSON.stringify(inventory));
+    
+      request(options3, (error3, results3)=> {
+        if (error3) {
+          res.status(500);
+          res.set('Content-Type', 'application/json');
+          res.send({error: 'Server error'});
+          console.log(error3);
+        }
+        let invValueAndStock = JSON.parse(results2.body).DataSet.Table;
+        let productDetails = JSON.parse(results3.body).DataSet.Table;
+
+        let invValue = 0;
+        let belowMinStock = [];
+        let inventoryProducts = [];
+  
+        for (let i = 0; i < invValueAndStock.length; i++) {
+          // Get Total Inventory Value
+          invValue += invValueAndStock[i].Column1 * invValueAndStock[i].PCMedio;
+
+          for (let k = 0; k < productDetails.length; k++) {
+            if (productDetails[k].Artigo == invValueAndStock[i].Artigo) {
+              inventoryProducts.push({
+                name: productDetails[k].Name,
+                valuePerUnit: invValueAndStock[i].PCMedio,
+                quantity: invValueAndStock[i].Column1,
+                prodTotalValue: invValueAndStock[i].Column1 * invValueAndStock[i].PCMedio
+              })
+              if (invValueAndStock[i].Column1 < productDetails[k].STKMinimo) {
+                belowMinStock.push({name:  productDetails[k].Name});
+              }
+            }
+          }
+        }
+  
+        let inventory = {
+          inventoryValue: invValue.toLocaleString(),
+          productsBelowSecurityStock: belowMinStock,
+          productsInventory: inventoryProducts
+        };
+        res.status(200);
+        res.set('Content-Type', 'application/json');
+        res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+        res.send(JSON.stringify(inventory));
+
+      });
     });
   });
 });
@@ -209,7 +222,7 @@ app.get('/purchases/ytd', (req,res)=>{
     form: {
       username: 'feup',
       password: 'qualquer1',
-      company: 'DEMO',
+      company: 'belaflor',
       instance: 'Default',
       grant_type: 'password',
       line: 'professional'
@@ -236,7 +249,7 @@ app.get('/purchases/ytd', (req,res)=>{
       headers,
       method: 'get',
       url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
-      body: '"Select abs(TotalMerc), DataDoc FROM CabecCompras where DataDoc >= \'2018-01-01T00:00:00\'"'
+      body: '"Select abs(TotalMerc), DataDoc FROM CabecCompras where DataDoc >= \'2019-01-01T00:00:00\'"'
     };
   
     request(options2, (error2, results2)=> {
@@ -286,7 +299,7 @@ app.get('/dashboard/purchases/total', (req,res)=>{
     form: {
       username: 'feup',
       password: 'qualquer1',
-      company: 'DEMO',
+      company: 'belaflor',
       instance: 'Default',
       grant_type: 'password',
       line: 'professional'
