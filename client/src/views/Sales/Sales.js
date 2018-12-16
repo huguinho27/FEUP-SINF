@@ -319,7 +319,7 @@ class Sales extends Component {
                                 <Col>
                                     <Card>
                                         <CardHeader>
-                                            Top Customers
+                                            All Time Top Customers
                                         </CardHeader>
                                         <CardBody>
                                             <Table responsive size="sm">

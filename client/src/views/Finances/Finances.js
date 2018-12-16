@@ -144,9 +144,9 @@ class Finances extends Component {
                                         </CardHeader>
                                         <CardBody className="pb-0 bg-info">
                                             <div className="text-value">Sales and Revenue:</div>
-                                            <div style={paddingCard}>420 hehe xd</div>
+                                            <div style={paddingCard}> </div>
                                             <div className="text-value">Operating Costs:</div>
-                                            <div style={paddingCard}>666 haha</div>
+                                            <div style={paddingCard}> </div>
                                         </CardBody>
                                     </Card>
                                 </Col>
