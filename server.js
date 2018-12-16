@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 
 //const hostname = '10.227.151.135';
-const hostname = '192.168.1.94';
+const hostname = '192.168.0.194';
 //const hostname = '169.254.73.28';
 
 var connection = mysql.createConnection({
@@ -20,7 +20,6 @@ var connection = mysql.createConnection({
 connection.connect();
 
 app.get('/dashboard/:start/:end', (req, res)=>{
-  //console.log('http://localhost:5000/dashboard/salestotal/'+req.params.start+'/'+req.params.end);
   //FIRST REQUEST - SALES
   let options = {
     method: 'get',
@@ -35,12 +34,13 @@ app.get('/dashboard/:start/:end', (req, res)=>{
     //SECOND REQUEST - PURCHASES
     let options2 = {
       method: 'get',
-      url: 'http://localhost:5000/dashboard/purchasestotal'
+      url: 'http://localhost:5000/dashboard/purchasestotal/'+req.params.start+'/'+req.params.end
     };
     request(options2, (error2, results2)=> {
       if (error2) {
         console.log(error2);
       }
+      console.log(results2.body);
       let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
       console.log('Primavera connected');
       //THIRD REQUEST - TOP 5 CUSTOMERS
@@ -118,18 +118,79 @@ app.get('/dashboard/:start/:end', (req, res)=>{
   });
 });
 
+app.get('/dashboard/salestotal/:start/:end', (req,res)=>{
+  connection.query('SELECT sum(CreditAmount) FROM saleslines where TaxPointDate > ' + '\'' + req.params.start + '\'' + ' AND TaxPointDate < ' + '\'' + req.params.end + '\'', (error, results, fields)=>{
+    if (error) throw error;
+    res.set('Content-Type', 'application/json');
+    res.status(200);
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.send(results);
+  });
+});
+
+app.get('/dashboard/purchasestotal/:start/:end', (req,res)=>{
+  let headers = {
+    'Content-type': 'application/x-www-form-urlencoded'
+  };
+
+  let options = {
+    method: 'post',
+    form: {
+      username: 'feup',
+      password: 'qualquer1',
+      company: 'belaflor',
+      instance: 'Default',
+      grant_type: 'password',
+      line: 'professional'
+    },
+    url: 'http://' + hostname + ':2018/WebApi/token',
+    headers
+  };
+
+  //Request to get authentication token
+  request(options, (error1, results1)=> {
+    if (error1) throw error1;
+    let parsedAuthentication = JSON.parse(results1.body);
+    let bearerToken = parsedAuthentication.access_token;
+    let bearer = parsedAuthentication.token_type;
+    
+    //Request to get purchases, providing the token
+    let headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer' + ' ' + bearerToken
+    };
+  
+    let options2 = {
+      headers,
+      method: 'get',
+      url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
+      body: '"SELECT abs(sum(TotalMerc)) FROM CabecCompras where DataDoc < ' + '\'' + req.params.end + '\'' + ' and DataDoc > ' + '\'' + req.params.start + '\'' + '"'
+    };
+    console.log(options2.body);
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        console.log(error2);
+      }
+      let obj = results2;
+      let obj2 = JSON.parse(results2.body);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.send(obj2.DataSet.Table[0]);
+    });
+  });
+});
+
+
 /**
  * Get customers from DB
  */
 app.get('/customers', (req, res)=>{
-  //connectDB();
   connection.query('SELECT CustomerID, AccountID, CustomerID, CompanyName, BillingAddressDetail, ' + 
   'BillingCity, BillingPostalCode, BillingCountry, ShipToAddressDetail, ShipToCity, ShipToPostalCode, ' +
   'ShipToCountry, Telephone, Fax, Website FROM customers', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
     res.send(results);
-    //connection.end();
   });
 });
 
@@ -179,11 +240,11 @@ app.get('/products', (req, res)=>{
 /**
  * Get sales from DB
  */
-app.get('/sales', (req, res)=>{
+app.get('/sales/:start/:end', (req, res)=>{
   connection.query('SELECT salesInvoices.InvoiceNo, salesInvoices.InvoiceDate, products.ProductType, products.ProductCode, products.ProductGroup, ' +
   'products.ProductDescription, salesLines.UnitPrice, salesLines.CreditAmount FROM salesLines INNER JOIN salesInvoices ' +
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
-  'products.ProductCode = salesLines.ProductCode', (error, results, fields)=>{
+  'products.ProductCode = salesLines.ProductCode where salesInvoices.InvoiceDate < ' + '\'' + req.params.end + '\'' + ' and salesInvoices.InvoiceDate > ' + '\'' + req.params.start + '\'', (error, results, fields)=>{
     if (error) throw error;
     console.log('Db returned: ', results);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -312,7 +373,7 @@ app.get('/suppliers', (req, res)=>{
   });
 });
 
-app.get('/purchases/ytd', (req,res)=>{
+app.get('/purchases/ytd/:start/:end', (req,res)=>{
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
   };
@@ -349,7 +410,7 @@ app.get('/purchases/ytd', (req,res)=>{
       headers,
       method: 'get',
       url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
-      body: '"Select abs(TotalMerc), DataDoc FROM CabecCompras where DataDoc >= \'2019-01-01T00:00:00\'"'
+      body: '"Select abs(TotalMerc), DataDoc FROM CabecCompras where DataDoc >= ' + '\'' + req.params.start + '\''  + ' AND DataDoc < ' + '\'' + req.params.end + '\''  + '"'
     };
   
     request(options2, (error2, results2)=> {
@@ -377,76 +438,14 @@ app.get('/dashboard/suppliers', (req, res)=>{
   });
 });
 
-app.get('/dashboard/salestotal/:start/:end', (req,res)=>{
-  connection.query('SELECT sum(CreditAmount) FROM saleslines where TaxPointDate > ' + '\'' + req.params.start + '\'' + ' AND TaxPointDate < ' + '\'' + req.params.end + '\'', (error, results, fields)=>{
-    if (error) throw error;
-    res.set('Content-Type', 'application/json');
-    res.status(200);
-    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.send(results);
-  });
-});
-
-app.get('/dashboard/purchasestotal', (req,res)=>{
-  let headers = {
-    'Content-type': 'application/x-www-form-urlencoded'
-  };
-
-  let options = {
-    method: 'post',
-    form: {
-      username: 'feup',
-      password: 'qualquer1',
-      company: 'belaflor',
-      instance: 'Default',
-      grant_type: 'password',
-      line: 'professional'
-    },
-    url: 'http://' + hostname + ':2018/WebApi/token',
-    headers
-  };
-
-  //Request to get authentication token
-  request(options, (error1, results1)=> {
-    if (error1) throw error1;
-    let parsedAuthentication = JSON.parse(results1.body);
-    let bearerToken = parsedAuthentication.access_token;
-    let bearer = parsedAuthentication.token_type;
-    
-    //Request to get purchases, providing the token
-    let headers = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer' + ' ' + bearerToken
-    };
-  
-    let options2 = {
-      headers,
-      method: 'get',
-      url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
-      body: '"SELECT abs(sum(TotalMerc)) FROM CabecCompras"'
-    };
-  
-    request(options2, (error2, results2)=> {
-      if (error2) {
-        console.log(error2);
-      }
-      let obj = results2;
-      let obj2 = JSON.parse(results2.body);
-      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-      res.send(obj2.DataSet.Table[0]);
-    });
-  });
-});
-
 /**
  * Get purchases from Primavera WebApi
  */
-app.get('/purchases', (req, res)=> {
+app.get('/purchases/:start/:end', (req, res)=> {
 
   let options = {
     method: 'get',
-    url: 'http://localhost:5000/dashboardpurchases/total'
+    url: 'http://localhost:5000/dashboard/purchasestotal/'+req.params.start+'/'+req.params.end
   };
   request(options, (error, results)=> {
     if (error) {
@@ -465,7 +464,7 @@ app.get('/purchases', (req, res)=> {
 
       let options3 = {
         method: 'get',
-        url: 'http://localhost:5000/purchases/ytd'
+        url: 'http://localhost:5000/purchases/ytd/'+req.params.start+'/'+req.params.end
       };
 
       request(options3, (error3, results3)=> {

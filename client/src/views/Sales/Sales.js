@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardBody, CardHeader, Table } from 'reactstrap';
+import { Row, Col, Card, CardBody, CardHeader, Button, ButtonGroup, ButtonToolbar, Table } from 'reactstrap';
 import { Bar } from 'react-chartjs-2';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import Dropdown from 'react-dropdown';
@@ -45,6 +45,11 @@ const rowPadding = {
     paddingBottom: '20px'
 }
 
+
+let exportButtonTopPadding = {
+  paddingTop: '2px',
+}
+
 var sale = {
     InvoiceDate: '',
     CreditAmount: 0,
@@ -58,58 +63,87 @@ const options = {
     maintainAspectRatio: false
 }
 
-const years = [
-    '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2017', '2018', 2019
-]
-const defaultYear = years[9]
-const months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-
-]
-const defaultMonth = months[4]
-
 class Sales extends Component {
     constructor (props) {
         super(props);
 
         this.state = {
-            salesYTD: null,
-            customerSales: [{},{}],
-            totalSales: "0",
+          salesYTD: null,
+          customerSales: [{},{}],
+          totalSales: "0",
+          years: ['2019'],
+          months: [
+              "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+          ],
+          months2: [
+            "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+          ],
+          defaultYear: '2019',
+          defaultMonth: 'January',
+          defaultMonth2: 'December'
         }
+        this.handleChangeMonth2 = this.handleChangeMonth2.bind(this);
+        this.handleChangeMonth1 = this.handleChangeMonth1.bind(this);
+        this.fetchSales = this.fetchSales.bind(this);
+    }
+
+    handleChangeMonth2(event) {
+      console.log(event);
+      this.setState({defaultMonth2: event.value});
+    }
+
+    handleChangeMonth1(event) {
+      console.log(event);
+      this.setState({defaultMonth: event.value});
     }
 
     componentWillMount() {
         this.fetchSales();
         this.fetchCustomerSales();
-        this.fetchTotalSales();
     }
 
-    fetchSales() {
-        fetch('http://localhost:5000/sales', 
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                }
-        })
-        .then(function(response) {
-            if (response.status >= 400) {
-                throw new Error("Bad response from server");
-            }
-            return response.json();
-        })
-        .catch(function(err){
-            console.log(err);
-        })
-        .then((json) => this.populateSalesYTD(json))
+    fetchSales(event) {
+      let startmonth, endmonth;
+      let startmonth1 = this.state.months.indexOf(this.state.defaultMonth)+1;
+      let endmonth1 =this.state.months2.indexOf(this.state.defaultMonth2)+1;
+      if (startmonth1 < 10) {
+        startmonth = '0' + startmonth1;
+      }
+      else {
+        startmonth = startmonth1;
+      }
+
+      if (endmonth1 < 10) {
+        endmonth = '0' + endmonth1;
+      }
+      else {
+        endmonth = endmonth1;
+      }
+      fetch('http://localhost:5000/sales/'+this.state.defaultYear + '-' + startmonth + '-01/'+this.state.defaultYear + '-' + endmonth + '-30', 
+      {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+          }
+      })
+      .then(function(response) {
+          if (response.status >= 400) {
+              throw new Error("Bad response from server");
+          }
+          return response.json();
+      })
+      .catch(function(err){
+          console.log(err);
+      })
+      .then((json) => this.populateSalesYTD(json))
+      this.fetchTotalSales();
     }
     
     populateSalesYTD(json) {
         let data = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
         for (let i = 0; i < json.length; i++) {
             let month = parseInt(json[i].InvoiceDate.split("-")[1]);
-            console.log(month);
+            //console.log(month);
 
             data[month-1] += json[i].CreditAmount;
         }
@@ -117,9 +151,6 @@ class Sales extends Component {
         for (let i = 0; i < data.length; i++) {
             data[i] = Number(Math.round(data[i]+'e2')+'e-2');
         }
-
-        //console.log(data);
-
         this.setState({salesYTD: data});
     }
 
@@ -144,7 +175,26 @@ class Sales extends Component {
     }
 
     fetchTotalSales() {
-        fetch('http://localhost:5000/dashboard/sales/total', 
+      console.log('fetch called!');
+      console.log('month1: ', this.state.defaultMonth);
+      console.log('month2: ', this.state.defaultMonth2);
+      let startmonth, endmonth;
+      let startmonth1 = this.state.months.indexOf(this.state.defaultMonth)+1;
+      let endmonth1 =this.state.months2.indexOf(this.state.defaultMonth2)+1;
+      if (startmonth1 < 10) {
+        startmonth = '0' + startmonth1;
+      }
+      else {
+        startmonth = startmonth1;
+      }
+
+      if (endmonth1 < 10) {
+        endmonth = '0' + endmonth1;
+      }
+      else {
+        endmonth = endmonth1;
+      }
+        fetch('http://localhost:5000/dashboard/salestotal/'+this.state.defaultYear + '-' + startmonth + '-01/'+this.state.defaultYear + '-' + endmonth + '-30', 
             {
                 method: "GET",
                 headers: {
@@ -211,26 +261,37 @@ class Sales extends Component {
 
                         <div style={padding} className="animated fadeIn">
 
-                            <div style={rowPadding}>
+                        <div style={rowPadding}>
                                 <Row>
                                     <Col xs="0" sm="1" lg="1">
                                         <div style={topPadding}>Timespan:</div>
                                     </Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                        <Dropdown options={this.state.years} value={this.state.defaultYear} placeholder="Select an option" />
                                     </Col>
                                     <Col xs="6" sm="5" lg="2">
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                        <Dropdown options={this.state.months} onChange={this.handleChangeMonth1} value={this.state.defaultMonth} placeholder="Select an option" />
                                     
                                     </Col>
                                     <Col xs="1" sm="1" lg="1">
                                         <div style={topPadding}> until </div></Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                        <Dropdown options={this.state.years} value={this.state.defaultYear} placeholder="Select an option" />
                                     </Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                        <Dropdown options={this.state.months} onChange={this.handleChangeMonth2} value={this.state.defaultMonth2} placeholder="Select an option" />
                                     </Col>
+
+                                    <Col xs="6" sm="5" lg="2">
+                                        <div style={exportButtonTopPadding}>
+                                            <ButtonGroup>
+                                                <ButtonToolbar>
+                                                    <Button color="success" onClick={this.fetchSales}>Export</Button>
+                                                </ButtonToolbar>
+                                            </ButtonGroup>
+                                        </div>
+                                    </Col>
+
                                 </Row>
                             </div>
 

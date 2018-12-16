@@ -92,20 +92,7 @@ const pie2 = {
         }],
 };
 
-const years = [
-    '2019'
-]
-const defaultYear = years[0]
-const months = [
-    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-]
-const months2 = [
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-]
-const defaultMonth = months[0]
-const defaultMonth2 = months2[11]
-
-const exportButtonTopPadding = {
+let exportButtonTopPadding = {
     paddingTop: '2px',
 }
 
@@ -121,18 +108,39 @@ class DefaultLayout extends Component {
         topSuppliersName: [],
         topSuppliersWebsite: [],
         topSuppliersAddress: [],
-        inventoryValue: 0
+        inventoryValue: 0,
+        years: ['2019'],
+        months: [
+            "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+        ],
+        months2: [
+          "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+        ],
+        defaultYear: '2019',
+        defaultMonth: 'January',
+        defaultMonth2: 'December'
       };
+      this.handleChangeMonth2 = this.handleChangeMonth2.bind(this);
+      this.handleChangeMonth1 = this.handleChangeMonth1.bind(this);
       this.fetchData = this.fetchData.bind(this);
     }
+
+    handleChangeMonth2(event) {
+      this.setState({defaultMonth2: event.value});
+    }
+
+    handleChangeMonth1(event) {
+      this.setState({defaultMonth: event.value});
+    }
+
     componentWillMount() {
       this.fetchData();
     }
+
     fetchData(event) {
-      console.log('fetch called!');
       let startmonth, endmonth;
-      let startmonth1 = months.indexOf(defaultMonth)+1;
-      let endmonth1 = months2.indexOf(defaultMonth2)+1;
+      let startmonth1 = this.state.months.indexOf(this.state.defaultMonth)+1;
+      let endmonth1 =this.state.months2.indexOf(this.state.defaultMonth2)+1;
       if (startmonth1 < 10) {
         startmonth = '0' + startmonth1;
       }
@@ -146,7 +154,7 @@ class DefaultLayout extends Component {
       else {
         endmonth = endmonth1;
       }
-      let url = 'http://localhost:5000/dashboard/'+defaultYear + '-' + startmonth + '-01/'+defaultYear + '-' + endmonth + '-31';
+      let url = 'http://localhost:5000/dashboard/'+this.state.defaultYear + '-' + startmonth + '-01/'+this.state.defaultYear + '-' + endmonth + '-30';
       console.log(url);
       fetch(url, {mode: 'cors'})
       .then(function(response) {
@@ -159,7 +167,6 @@ class DefaultLayout extends Component {
         console.log('Error: ', err);
       })
       .then((json) => {
-        console.log(json);
         this.setState({
         totalSales: json.totalSales,
         totalPurchases: json.totalPurchases,
@@ -169,7 +176,7 @@ class DefaultLayout extends Component {
         topSuppliersWebsite: json.suppliersWebsite,
         topSuppliersAddress: json.suppliersAddress,
         inventoryValue: json.inventoryValue
-      })
+      });
     })
     }
     
@@ -184,6 +191,7 @@ class DefaultLayout extends Component {
       }
       return rows;
     }
+
     render() {
       var pie1 = {
         labels: this.state.topCustomersCompany,
@@ -235,19 +243,19 @@ class DefaultLayout extends Component {
                                         <div style={topPadding}>Timespan:</div>
                                     </Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                        <Dropdown options={this.state.years} value={this.state.defaultYear} placeholder="Select an option" />
                                     </Col>
                                     <Col xs="6" sm="5" lg="2">
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
+                                        <Dropdown options={this.state.months} onChange={this.handleChangeMonth1} value={this.state.defaultMonth} placeholder="Select an option" />
                                     
                                     </Col>
                                     <Col xs="1" sm="1" lg="1">
                                         <div style={topPadding}> until </div></Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
+                                        <Dropdown options={this.state.years} value={this.state.defaultYear} placeholder="Select an option" />
                                     </Col>
                                     <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth2} placeholder="Select an option" />
+                                        <Dropdown options={this.state.months} onChange={this.handleChangeMonth2} value={this.state.defaultMonth2} placeholder="Select an option" />
                                     </Col>
 
                                     <Col xs="6" sm="5" lg="2">
@@ -305,7 +313,7 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6">
                                 <Card>
                                     <CardHeader>
-                                        Top Customers
+                                        All time Top Customers
                                     </CardHeader>
                                     <CardBody>
                                         <div className="chart-wrapper">
@@ -317,7 +325,7 @@ class DefaultLayout extends Component {
                             <Col xs="12" sm="6">
                             <Card>
                                 <CardHeader>
-                                    <i className="fa fa-align-justify"></i> Top suppliers
+                                    <i className="fa fa-align-justify"></i>All time Top suppliers
                                 </CardHeader>
                                 <CardBody>
                                     <Table responsive striped>
