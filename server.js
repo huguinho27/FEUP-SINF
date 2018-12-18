@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 
-const hostname = '192.168.0.194';
+const hostname = '192.168.1.95';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -189,12 +189,32 @@ app.get('/finances', (req, res)=>{
       res.send({error: 'Server error'});
       console.log(error);
     }
-    console.log(results.body);
 
-    res.status(200);
-    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.set('Content-Type', 'application/json');
-    res.send(results.body);
+    let options2 = {
+      method: 'get',
+      url: 'http://localhost:5000/finances/profitandloss'
+    };
+
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        res.status(500);
+        res.set('Content-Type', 'application/json');
+        res.send({error: 'Server error'});
+        console.log(error2);
+      }
+      let obj1 = JSON.parse(results.body);
+      let obj2 = JSON.parse(results2.body);
+
+      var result = {};
+      for(var key in obj1) result[key] = obj1[key];
+      for(var key in obj2) result[key] = obj2[key];
+      
+      res.status(200);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.set('Content-Type', 'application/json');
+      res.send(JSON.stringify(result));
+    });
+
   });
 });
 
@@ -269,6 +289,23 @@ app.get('/finances/growth', (req,res)=>{
         });
       });
     });
+  });
+});
+
+/**
+ * Get relevant generalledgeraccounts info
+ */
+app.get('/finances/profitandloss', (req, res)=>{
+  connection.query('select revenue, expenses, (revenue - expenses) as grossProfit, incomeTaxes, (revenue - expenses - incomeTaxes) as netEarnings ' + 
+          'from (select' + 
+          '(select closingdebitbalance from generalledgeraccounts where accountid = \'21\') as revenue, ' + 
+          '(select closingcreditbalance from generalledgeraccounts where accountid = \'22\') as expenses, ' + 
+          '(select closingcreditbalance from generalledgeraccounts where accountid = \'2433\') as incomeTaxes) ' +
+          'as tmp;',
+        (error, results, fields)=>{
+    if (error) throw error;
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.send(results[0]);
   });
 });
 
