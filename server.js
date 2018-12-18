@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 
-const hostname = '192.168.0.194';
+const hostname = '192.168.1.99';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -269,6 +269,23 @@ app.get('/finances/growth', (req,res)=>{
         });
       });
     });
+  });
+});
+
+/**
+ * Get relevant generalledgeraccounts info
+ */
+app.get('/finances/profitandloss', (req, res)=>{
+  connection.query('select revenue, expenses, (revenue - expenses) as grossProfit, incomeTaxes, (revenue - expenses - incomeTaxes) as netEarnings ' + 
+          'from (select' + 
+          '(select closingdebitbalance from generalledgeraccounts where accountid = \'21\') as revenue, ' + 
+          '(select closingcreditbalance from generalledgeraccounts where accountid = \'22\') as expenses, ' + 
+          '(select closingcreditbalance from generalledgeraccounts where accountid = \'2433\') as incomeTaxes) ' +
+          'as tmp;',
+        (error, results, fields)=>{
+    if (error) throw error;
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.send(results[0]);
   });
 });
 

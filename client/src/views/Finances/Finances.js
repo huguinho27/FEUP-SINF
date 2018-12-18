@@ -50,7 +50,12 @@ class Finances extends Component {
 
     this.state = {
       salesgrowth: 0,
-      purchasesgrowth: 0
+      purchasesgrowth: 0,
+      revenue: 0,
+      expenses: 0,
+      grossProfit: 0,
+      incomeTaxes: 0,
+      netEarnings: 0,
     };
     this.fetchData = this.fetchData.bind(this);
   }
@@ -73,7 +78,12 @@ class Finances extends Component {
     .then((json) => {
       this.setState({
         salesgrowth: json.externalQuarterGrowthSales,
-        purchasesgrowth: json.externalQuarterGrowthPurchases
+        purchasesgrowth: json.externalQuarterGrowthPurchases,
+        /*revenue: json.revenue,
+        expenses: json.expenses,
+        grossProfit: json.grossProfit,
+        incomeTaxes: json.incomeTaxes,
+        netEarnings: json.netEarnings,*/
     });
   })
   }
@@ -103,15 +113,41 @@ class Finances extends Component {
 
                             <Row>
                                 <Col>
-                                    <Card className="text-white bg-primary">
+                                    <Card>
                                         <CardHeader>
                                             <div className="text-value">Profit and Loss Statement</div>
                                         </CardHeader>
-                                        <CardBody className="pb-0 bg-info">
-                                            <div className="text-value">Sales and Revenue:</div>
-                                            <div style={paddingCard}> </div>
-                                            <div className="text-value">Operating Costs:</div>
-                                            <div style={paddingCard}> </div>
+                                        <CardBody>
+                                            <Table responsive>
+                                                <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>2019</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style={boldLetters}>Total Net Revenue</td>
+                                                        <td>TODO</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={boldLetters}>Total Expenses</td>
+                                                        <td>TODO</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={boldLetters}>Gross Profit</td>
+                                                        <td>TODO</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={boldLetters}>Income Taxes</td>
+                                                        <td>TODO</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={boldLetters}>Net Earnings</td>
+                                                        <td>TODO</td>
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
                                         </CardBody>
                                     </Card>
                                 </Col>
