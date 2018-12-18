@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 
-const hostname = '192.168.1.99';
+const hostname = '192.168.1.95';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -189,12 +189,32 @@ app.get('/finances', (req, res)=>{
       res.send({error: 'Server error'});
       console.log(error);
     }
-    console.log(results.body);
 
-    res.status(200);
-    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.set('Content-Type', 'application/json');
-    res.send(results.body);
+    let options2 = {
+      method: 'get',
+      url: 'http://localhost:5000/finances/profitandloss'
+    };
+
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        res.status(500);
+        res.set('Content-Type', 'application/json');
+        res.send({error: 'Server error'});
+        console.log(error2);
+      }
+      let obj1 = JSON.parse(results.body);
+      let obj2 = JSON.parse(results2.body);
+
+      var result = {};
+      for(var key in obj1) result[key] = obj1[key];
+      for(var key in obj2) result[key] = obj2[key];
+      
+      res.status(200);
+      res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+      res.set('Content-Type', 'application/json');
+      res.send(JSON.stringify(result));
+    });
+
   });
 });
 
