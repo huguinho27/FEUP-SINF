@@ -133,7 +133,7 @@ class Finances extends Component {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td style={boldLetters}>1st and 4th Quarters</td>
+                                                    <td style={boldLetters}>First and Last Quarters</td>
                                                 </tr>
                                             </tbody>
                                             </Table>
