@@ -161,9 +161,6 @@ class Inventory extends Component {
 
                     </main>
                 </div>
-                <AppFooter>
-                    <DefaultFooter />
-                </AppFooter>
             </div>  
         );
     }

@@ -109,6 +109,7 @@ class DefaultLayout extends Component {
         topSuppliersWebsite: [],
         topSuppliersAddress: [],
         inventoryValue: 0,
+        grossprofit: 0,
         years: ['2019'],
         months: [
             "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
@@ -175,7 +176,8 @@ class DefaultLayout extends Component {
         topSuppliersName: json.suppliersName,
         topSuppliersWebsite: json.suppliersWebsite,
         topSuppliersAddress: json.suppliersAddress,
-        inventoryValue: json.inventoryValue
+        inventoryValue: json.inventoryValue,
+        grossprofit: json.grossProfit
       });
     })
     }
@@ -294,7 +296,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Gross Profit</div>
-                                        <div style={paddingCard}>44.46 %</div>
+                                        <div style={paddingCard}>{Number(Math.round(this.state.grossprofit +'e2')+'e-2')}</div>
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -348,9 +350,6 @@ class DefaultLayout extends Component {
                         </div>
                     </main>
                 </div>
-                <AppFooter>
-                    <DefaultFooter />
-                </AppFooter>
             </div>  
         );
     }

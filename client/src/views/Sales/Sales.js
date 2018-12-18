@@ -307,10 +307,6 @@ class Sales extends Component {
                                                     <div className="text-value">Total Sales</div>
                                                     <div style={paddingCard}>{this.state.totalSales} €</div>
                                                 </Col>
-                                                <Col>
-                                                    <div className="text-value">Growth</div>
-                                                    <div style={paddingCard}>4,20 %</div>
-                                                </Col>
                                             </Row>
                                         </CardBody>
                                     </Card>
@@ -371,9 +367,6 @@ class Sales extends Component {
 
                     </main>
                 </div>
-                <AppFooter>
-                    <DefaultFooter />
-                </AppFooter>
             </div>
         );
     }

@@ -174,8 +174,8 @@ class Finances extends Component {
                                             <tbody>
                                                 <tr>
                                                     <td style={boldLetters}>First and Last Quarters</td>
-                                                    <td style={centerText}>hardcode 1</td>
-                                                    <td style={centerText}>2</td>
+                                                    <td style={centerText}>{this.state.salesgrowth} %</td>
+                                                    <td style={centerText}> {this.state.purchasesgrowth} %</td>
                                                 </tr>
                                             </tbody>
                                             </Table>
@@ -189,9 +189,6 @@ class Finances extends Component {
 
                     </main>
                 </div>
-                <AppFooter>
-                    <DefaultFooter />
-                </AppFooter>
             </div>  
         );
     }

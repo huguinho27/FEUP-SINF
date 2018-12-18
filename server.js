@@ -95,19 +95,36 @@ app.get('/dashboard/:start/:end', (req, res)=>{
             }
             let obj2 = JSON.parse(results3.body);
 
-            let dashboard = {
-              totalSales: sales,
-              totalPurchases: purchases,
-              topCustomersCompany: topcustomerscompany,
-              topCustomersTotal: topcustomerstotal,
-              suppliersName: suppliersname,
-              suppliersWebsite: supplierswebsite,
-              suppliersAddress: suppliersaddress,
-              inventoryValue: obj2.inventoryValue
-            };
-            res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-            res.set('Content-Type', 'application/json');
-            res.send(JSON.stringify(dashboard));
+            // Request to get inventory value
+          let options4 = {
+            method: 'get',
+            url: 'http://localhost:5000/finances/profitandloss'
+          };
+
+            request(options4, (error4, results4)=> {
+              if (error4) {
+                res.status(500);
+                res.set('Content-Type', 'application/json');
+                res.send({error: 'Server error'});
+                console.log(error4);
+              }
+              let obj3 = JSON.parse(results4.body);
+
+              let dashboard = {
+                totalSales: sales,
+                totalPurchases: purchases,
+                topCustomersCompany: topcustomerscompany,
+                topCustomersTotal: topcustomerstotal,
+                suppliersName: suppliersname,
+                suppliersWebsite: supplierswebsite,
+                suppliersAddress: suppliersaddress,
+                inventoryValue: obj2.inventoryValue,
+                grossProfit: obj3.grossProfit
+              };
+              res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+              res.set('Content-Type', 'application/json');
+              res.send(JSON.stringify(dashboard));
+            });
           });
         });
       });
