@@ -79,11 +79,11 @@ class Finances extends Component {
       this.setState({
         salesgrowth: json.externalQuarterGrowthSales,
         purchasesgrowth: json.externalQuarterGrowthPurchases,
-        /*revenue: json.revenue,
+        revenue: json.revenue,
         expenses: json.expenses,
         grossProfit: json.grossProfit,
         incomeTaxes: json.incomeTaxes,
-        netEarnings: json.netEarnings,*/
+        netEarnings: json.netEarnings,
     });
   })
   }
@@ -128,23 +128,23 @@ class Finances extends Component {
                                                 <tbody>
                                                     <tr>
                                                         <td style={boldLetters}>Total Net Revenue</td>
-                                                        <td>TODO</td>
+                                                        <td>{Number(Math.round(this.state.revenue +'e2')+'e-2')}</td>
                                                     </tr>
                                                     <tr>
                                                         <td style={boldLetters}>Total Expenses</td>
-                                                        <td>TODO</td>
+                                                        <td>{Number(Math.round(this.state.expenses +'e2')+'e-2')}</td>
                                                     </tr>
                                                     <tr>
                                                         <td style={boldLetters}>Gross Profit</td>
-                                                        <td>TODO</td>
+                                                        <td>{Number(Math.round(this.state.grossProfit +'e2')+'e-2')}</td>
                                                     </tr>
                                                     <tr>
                                                         <td style={boldLetters}>Income Taxes</td>
-                                                        <td>TODO</td>
+                                                        <td>{Number(Math.round(this.state.incomeTaxes +'e2')+'e-2')}</td>
                                                     </tr>
                                                     <tr>
                                                         <td style={boldLetters}>Net Earnings</td>
-                                                        <td>TODO</td>
+                                                        <td>{Number(Math.round(this.state.netEarnings +'e2')+'e-2')}</td>
                                                     </tr>
                                                 </tbody>
                                             </Table>
