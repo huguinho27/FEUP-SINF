@@ -45,7 +45,38 @@ const boldLetters = {
 }
 
 class Finances extends Component {
-    
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      salesgrowth: 0,
+      purchasesgrowth: 0
+    };
+    this.fetchData = this.fetchData.bind(this);
+  }
+
+  componentWillMount() {
+    this.fetchData();
+  }
+
+  fetchData(event) {
+    fetch('http://localhost:5000/finances', {mode: 'cors'})
+    .then(function(response) {
+      if (response.status >= 400) {
+         throw new Error("Bad response from server");
+      }
+      return response.json();
+    })
+    .catch(function(err){
+      console.log('Error: ', err);
+    })
+    .then((json) => {
+      this.setState({
+        salesgrowth: json.externalQuarterGrowthSales,
+        purchasesgrowth: json.externalQuarterGrowthPurchases
+    });
+  })
+  }
 
     render() {
         return (

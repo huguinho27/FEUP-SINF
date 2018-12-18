@@ -176,6 +176,28 @@ app.get('/dashboard/purchasestotal/:start/:end', (req,res)=>{
   });
 });
 
+app.get('/finances', (req, res)=>{
+  let options = {
+    method: 'get',
+    url: 'http://localhost:5000/finances/growth'
+  };
+
+  request(options, (error, results)=> {
+    if (error) {
+      res.status(500);
+      res.set('Content-Type', 'application/json');
+      res.send({error: 'Server error'});
+      console.log(error);
+    }
+    console.log(results.body);
+
+    res.status(200);
+    res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.set('Content-Type', 'application/json');
+    res.send(results.body);
+  });
+});
+
 app.get('/finances/growth', (req,res)=>{
   let options1 = {
     method: 'get',
