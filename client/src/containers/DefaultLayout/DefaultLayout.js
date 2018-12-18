@@ -154,7 +154,7 @@ class DefaultLayout extends Component {
       else {
         endmonth = endmonth1;
       }
-      let url = 'http://localhost:5000/dashboard/'+this.state.defaultYear + '-' + startmonth + '-01/'+this.state.defaultYear + '-' + endmonth + '-30';
+      let url = 'http://localhost:5000/dashboard/'+this.state.defaultYear + '-' + startmonth + '-01/'+this.state.defaultYear + '-' + endmonth + '-28';
       console.log(url);
       fetch(url, {mode: 'cors'})
       .then(function(response) {

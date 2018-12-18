@@ -113,27 +113,6 @@ class Finances extends Component {
                         <div style={padding} className="animated fadeIn">  
 
                         <div style={rowPadding}>
-                                <Row>
-                                    <Col xs="0" sm="1" lg="1">
-                                        <div style={topPadding}>Timespan:</div>
-                                    </Col>
-                                    <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
-                                    </Col>
-                                    <Col xs="6" sm="5" lg="2">
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
-                                    
-                                    </Col>
-                                    <Col xs="1" sm="1" lg="1">
-                                        <div style={topPadding}> until </div></Col>
-                                    <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={years} onChange={this._onSelect} value={defaultYear} placeholder="Select an option" />
-                                    </Col>
-                                    <Col xs="6" sm="5" lg="2" >
-                                        <Dropdown options={months} onChange={this._onSelect} value={defaultMonth} placeholder="Select an option" />
-                                    </Col>
-
-                                </Row>
                             </div>
 
                             <Row>

@@ -7,9 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 
-//const hostname = '10.227.151.135';
-const hostname = '192.168.0.194';
-//const hostname = '169.254.73.28';
+const hostname = '10.227.157.54';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
