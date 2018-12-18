@@ -276,7 +276,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-info">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Total Sales</div>
-                                        <div style={paddingCard}>{this.state.totalSales} €</div>
+                                        <div key={this.state.totalSales} style={paddingCard}>{this.state.totalSales} €</div>
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -285,7 +285,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Total Purchases</div>
-                                        <div style={paddingCard}>{this.state.totalPurchases} €</div>                                        
+                                        <div key={this.state.totalPurchases} style={paddingCard}>{this.state.totalPurchases} €</div>                                        
                                     </CardBody>
                                 </Card>
                             </Col>
@@ -303,7 +303,7 @@ class DefaultLayout extends Component {
                                 <Card className="text-white bg-primary">
                                     <CardBody className="pb-0">
                                         <div className="text-value">Inventory Value</div>
-                                        <div style={paddingCard}>{this.state.inventoryValue} €</div>
+                                        <div key={this.state.inventoryValue} style={paddingCard}>{this.state.inventoryValue} €</div>
                                     </CardBody>        
                                 </Card>
                             </Col>
