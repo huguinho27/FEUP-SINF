@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 
-const hostname = '10.227.157.54';
+const hostname = '192.168.0.194';
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -38,7 +38,6 @@ app.get('/dashboard/:start/:end', (req, res)=>{
       if (error2) {
         console.log(error2);
       }
-      console.log(results2.body);
       let purchases = Math.floor(JSON.parse(results2.body)['Column1']).toLocaleString();
       console.log('Primavera connected');
       //THIRD REQUEST - TOP 5 CUSTOMERS
@@ -165,7 +164,6 @@ app.get('/dashboard/purchasestotal/:start/:end', (req,res)=>{
       url: 'http://' + hostname + ':2018/WebApi/Administrador/Consulta',
       body: '"SELECT abs(sum(TotalMerc)) FROM CabecCompras where DataDoc < ' + '\'' + req.params.end + '\'' + ' and DataDoc > ' + '\'' + req.params.start + '\'' + '"'
     };
-    console.log(options2.body);
     request(options2, (error2, results2)=> {
       if (error2) {
         console.log(error2);
@@ -178,17 +176,77 @@ app.get('/dashboard/purchasestotal/:start/:end', (req,res)=>{
   });
 });
 
+app.get('/finances/growth', (req,res)=>{
+  let options1 = {
+    method: 'get',
+    url: 'http://localhost:5000/dashboard/salestotal/2019-01-01/:2019-03-31'
+  };
 
-/**
- * Get customers from DB
- */
-app.get('/customers', (req, res)=>{
-  connection.query('SELECT CustomerID, AccountID, CustomerID, CompanyName, BillingAddressDetail, ' + 
-  'BillingCity, BillingPostalCode, BillingCountry, ShipToAddressDetail, ShipToCity, ShipToPostalCode, ' +
-  'ShipToCountry, Telephone, Fax, Website FROM customers', (error, results, fields)=>{
-    if (error) throw error;
-    console.log('Db returned: ', results);
-    res.send(results);
+  request(options1, (error1, results1)=> {
+    if (error1) {
+      res.status(500);
+      res.set('Content-Type', 'application/json');
+      res.send({error: 'Server error'});
+      console.log(error1);
+    }
+    let quarter1sales = JSON.parse(results1.body)[0]['sum(CreditAmount)'];
+
+    let options2 = {
+      method: 'get',
+      url: 'http://localhost:5000/dashboard/salestotal/2019-10-01/2019-12-31'
+    };
+  
+    request(options2, (error2, results2)=> {
+      if (error2) {
+        res.status(500);
+        res.set('Content-Type', 'application/json');
+        res.send({error: 'Server error'});
+        console.log(error2);
+      }
+      let lastQuarterSales = JSON.parse(results2.body)[0]['sum(CreditAmount)'];
+      let externalQuartersGrowthSales = ((lastQuarterSales - quarter1sales) / quarter1sales) * 100;
+
+      let options3 = {
+        method: 'get',
+        url: 'http://localhost:5000/dashboard/purchasestotal/2019-10-01/2019-12-31'
+      };
+      request(options3, (error3, results3)=> {
+        if (error3) {
+          res.status(500);
+          res.set('Content-Type', 'application/json');
+          res.send({error: 'Server error'});
+          console.log(error3);
+        }
+        let obj = JSON.parse(results3.body);
+        let purchasesLastQuarter = obj.Column1;
+
+        let options4 = {
+          method: 'get',
+          url: 'http://localhost:5000/dashboard/purchasestotal/2019-01-01/2019-03-31'
+        };
+        request(options4, (error4, results4)=> {
+          if (error4) {
+            res.status(500);
+            res.set('Content-Type', 'application/json');
+            res.send({error: 'Server error'});
+            console.log(error4);
+          }
+          let obj2 = JSON.parse(results4.body);
+          let purchasesFirstQuarter = obj2.Column1;
+
+          let externalQuartersGrowthPurchases = ((purchasesLastQuarter - purchasesFirstQuarter) / purchasesFirstQuarter) * 100;
+
+          let financesgrowth = {
+            'externalQuarterGrowthSales': externalQuartersGrowthSales.toLocaleString(),
+            'externalQuarterGrowthPurchases': externalQuartersGrowthPurchases.toLocaleString()
+          };
+          res.status(200);
+          res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+          res.set('Content-Type', 'application/json');
+          res.send(JSON.stringify(financesgrowth));
+        });
+      });
+    });
   });
 });
 
@@ -196,7 +254,6 @@ app.get('/customers', (req, res)=>{
  * Get customers by sales value from DB
  */
 app.get('/customersales', (req, res)=>{
-  //connectDB();
   connection.query('select customers.CompanyName, salesinvoices.GrossTotal ' + 
           'from salesinvoices, customers ' + 
           ' where salesinvoices.CustomerID = customers.CustomerID ' + 
@@ -206,31 +263,6 @@ app.get('/customersales', (req, res)=>{
         (error, results, fields)=>{
     if (error) throw error;
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    //connection.end();
-    res.send(results);
-  });
-});
-
-/**
- * Get invoices from DB
- */
-app.get('/invoices', (req, res)=>{
-  connection.query('SELECT salesinvoices.InvoiceNo, salesinvoices.InvoiceDate, salesinvoices.GrossTotal, ' +
-  'customers.CompanyName FROM salesinvoices, customers' + 
-  'WHERE salesinvoices.CustomerID = customers.CustomerID', (error, results, fields)=>{
-    if (error) throw error;
-    console.log('Db returned: ', results);
-    res.send(results);
-  });
-});
-
-/**
- * Get products from DB
- */
-app.get('/products', (req, res)=>{
-  connection.query('SELECT * FROM products', (error, results, fields)=>{
-    if (error) throw error;
-    console.log('Db returned: ', results);
     res.send(results);
   });
 });
@@ -244,7 +276,6 @@ app.get('/sales/:start/:end', (req, res)=>{
   'ON salesInvoices.InvoiceNo = salesLines.InvoiceNo INNER JOIN products ON ' +
   'products.ProductCode = salesLines.ProductCode where salesInvoices.InvoiceDate < ' + '\'' + req.params.end + '\'' + ' and salesInvoices.InvoiceDate > ' + '\'' + req.params.start + '\'', (error, results, fields)=>{
     if (error) throw error;
-    console.log('Db returned: ', results);
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.send(results);
   });
@@ -356,21 +387,6 @@ app.get('/inventory', (req, res)=>{
   });
 });
 
-/**
- * Get suppliers from DB
- */
-app.get('/suppliers', (req, res)=>{
-  //connectDB();
-  connection.query('SELECT SupplierID, AccountID, SupplierTaxID, CompanyName, BillingAddressDetail, BillingCity, ' +
-  'BillingPostalCode, BillingCountry, ShipFromAddressDetail, ShipFromCity, ShipFromPostalCode, ShipFromCountry, ' +
-  'Telephone, Fax, Website FROM suppliers', (error, results, fields)=>{
-    if (error) throw error;
-    console.log('Db returned: ', results);
-    //connection.end();
-    res.send(results);
-  });
-});
-
 app.get('/purchases/ytd/:start/:end', (req,res)=>{
   let headers = {
     'Content-type': 'application/x-www-form-urlencoded'
@@ -427,11 +443,9 @@ app.get('/purchases/ytd/:start/:end', (req,res)=>{
  * Get suppliers from DB
  */
 app.get('/dashboard/suppliers', (req, res)=>{
-  //connectDB();
   connection.query('SELECT Website, CompanyName, BillingAddressDetail FROM suppliers', (error, results, fields)=> {
     if (error) throw error;
     res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
-    //connection.end();
     res.send(results);
   });
 });
