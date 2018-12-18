@@ -44,6 +44,10 @@ const boldLetters = {
     fontWeight: 'bold'
 }
 
+const centerText = {
+    textAlign: 'center'
+}
+
 class Finances extends Component {
   constructor (props) {
     super(props);
@@ -163,13 +167,15 @@ class Finances extends Component {
                                             <thead>
                                             <tr>
                                                 <th></th>
-                                                <th>Sales Growth</th>
-                                                <th>Purchases Growth</th>
+                                                <th style={centerText}>Sales Growth</th>
+                                                <th style={centerText}>Purchases Growth</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td style={boldLetters}>First and Last Quarters</td>
+                                                    <td style={centerText}>hardcode 1</td>
+                                                    <td style={centerText}>2</td>
                                                 </tr>
                                             </tbody>
                                             </Table>
